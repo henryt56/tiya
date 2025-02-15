@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -9,25 +7,24 @@
 /coverage
 
 # production
-/build
+
 
 # misc
 .DS_Store
+.env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.development
+.env.test
+.env.production
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-
 # Firebase files that should NOT be committed
 .firebase/
-
-# Firebase authentication credentials (if you generate a service account key)
 service-account.json
-
-# Ignore Firebase cache files
 .firebaserc
+
+# Ignore Firebase config if it contains sensitive keys
+src/firebaseConfig.js
