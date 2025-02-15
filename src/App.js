@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
+    <AuthProvider>
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
@@ -19,10 +20,11 @@ function App() {
           Learn React
         </a>
         <div>
-      Test div
-    </div>
+          Test div
+        </div>
       </header>
     </div>
+    </AuthProvider>
   );
 }
 
