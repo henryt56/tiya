@@ -1,6 +1,6 @@
 import { auth, db } from "../firebaseConfig";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
+import { setDoc, doc, getDoc } from "firebase/firestore";
 
 // Register User (Student or Tutor)
 export const registerUser = async (email, password, role) => {

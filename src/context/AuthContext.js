@@ -3,6 +3,7 @@ import { auth } from "../firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { getUserRole } from "../services/authService";
 
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
