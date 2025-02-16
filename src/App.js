@@ -8,6 +8,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+        {/* Test git pull and push */}
         <p>
           This is an edit made on App.js
         </p>
