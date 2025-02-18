@@ -1,30 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
-import { AuthProvider } from './context/AuthContext';
+import Login from "./components/auth/login";
+import Register from "./components/auth/register";
+
+import Header from "./components/header";
+import Home from "./components/home";
+
+import { AuthProvider } from "./contexts/authContext";
+import { useRoutes } from "react-router-dom";
 
 function App() {
+  const routesArray = [
+    {
+      path: "*",
+      element: <Login />,
+    },
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: "/register",
+      element: <Register />,
+    },
+    {
+      path: "/home",
+      element: <Home />,
+    },
+  ];
+  let routesElement = useRoutes(routesArray);
   return (
     <AuthProvider>
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        {/* Test git pull and push */}
-        <p>
-          This is an edit made on App.js
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <div>
-          Test div
-        </div>
-      </header>
-    </div>
+      <Header />
+      <div>{routesElement}</div>
     </AuthProvider>
   );
 }

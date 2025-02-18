@@ -22,7 +22,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Firebase files that should NOT be committed
-.firebase/
+firebase/firebaseConfig
 service-account.json
 .firebaserc
 
