@@ -1,11 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
-/*import { AuthProvider } from './context/AuthContext'; AUTHENTICATION NOT YET IMPLEMENTED*/
+import { AuthProvider } from './context/AuthContext.js';
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 function App() {
   return (
-    /*<AuthProvider>*/
+    <AuthProvider>
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
@@ -26,7 +26,7 @@ function App() {
         </div>
       </header>
     </div>
-    /*</AuthProvider>*/
+    </AuthProvider>
   );
 }
 
