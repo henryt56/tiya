@@ -1,9 +1,11 @@
+import React from 'react';
+
 function PaymentsPage() {
-    return (
-        <div>
-            <h1>Payment</h1>
-        </div>
-    );
+  return (
+    <div>
+      <h1>Payment</h1>
+    </div>
+  );
 }
 
 export default PaymentsPage;

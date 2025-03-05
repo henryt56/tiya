@@ -1,9 +1,11 @@
+import React from 'react';
+
 function TransactionHistoryPage() {
-    return (
-        <div>
-            <h1>Transaction History</h1>
-        </div>
-    );
+  return (
+    <div>
+      <h1>Transaction History</h1>
+    </div>
+  );
 }
 
 export default TransactionHistoryPage;
