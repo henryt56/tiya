@@ -1,6 +1,6 @@
 import styles from "./Header.module.css";
 import Logo from "./Logo";
-import Banner from "./banner";
+import Banner from "./Banner.js";
 
 export default function Header() {
   return (
