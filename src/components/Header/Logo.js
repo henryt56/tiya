@@ -1,6 +1,6 @@
 import Image from "next/image";
 import styles from "./Logo.module.css";
-import Link from "next/Link";
+import Link from "next/link";
 
 export default function Logo() {
   return (
