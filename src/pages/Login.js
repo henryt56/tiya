@@ -1,11 +1,9 @@
-import React from 'react';
-
-function LoginPage() {
+import AuthRoute from '../components/Routes/AuthRoute';
+import Login from '../components/login-register/Login';
+export default function LoginPage() {
   return (
-    <div>
-      <h1>Log in</h1>
-    </div>
+    <AuthRoute>
+      <Login />
+    </AuthRoute>
   );
 }
-
-export default LoginPage;

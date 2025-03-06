@@ -1,11 +1,10 @@
-import React from 'react';
+import ProtectedRoute from '../components/Routes/ProtectedRoute';
+import TutorDashboard from '../components/Dashboards/TutorDashboard';
 
-function TutorDashboardPage() {
+export default function TutorDashboardPage() {
   return (
-    <div>
-      <h1>Tutor Dashboard</h1>
-    </div>
+    <ProtectedRoute allowedRoles={['tutor']}>
+      <TutorDashboard />
+    </ProtectedRoute>
   );
 }
-
-export default TutorDashboardPage;

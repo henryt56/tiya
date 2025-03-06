@@ -1,11 +1,10 @@
-import React from 'react';
+import ProtectedRoute from '../components/Routes/ProtectedRoute';
+import StudentDashboard from '../components/Dashboards/StudentDashboard';
 
-function StudentDashboardPage() {
+export default function StudentDashboardPage() {
   return (
-    <div>
-      <h1>Student Dashboard</h1>
-    </div>
+    <ProtectedRoute allowedRoles={['student']}>
+      <StudentDashboard />
+    </ProtectedRoute>
   );
 }
-
-export default StudentDashboardPage;
