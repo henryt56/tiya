@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './Banner.module.css';
 import { MdOutlineMessage } from 'react-icons/md';
 import { CgProfile } from 'react-icons/cg';
