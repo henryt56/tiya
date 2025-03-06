@@ -4,12 +4,20 @@ import '../styles/global.css';
 import { AuthProvider } from '../context/AuthContext.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../components/Header';
+import { Montserrat } from 'next/font/google';
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-montserrat',
+});
 
 function MyApp({ Component, pageProps }) {
   return (
     <AuthProvider>
-      <Header />
-      <main>
+      <main className={montserrat.className}>
+        <Header />
         <Component {...pageProps} />
       </main>
     </AuthProvider>
