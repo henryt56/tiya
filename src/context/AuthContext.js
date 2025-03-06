@@ -1,18 +1,14 @@
 // context/AuthContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { 
-  getAuth, 
+import {
+  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged 
+  onAuthStateChanged,
 } from 'firebase/auth';
-import { 
-  getFirestore, 
-  doc, 
-  getDoc 
-} from 'firebase/firestore';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 
 const AuthContext = createContext();
@@ -22,26 +18,25 @@ export const AuthProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  
+
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Logout 
+  // Logout
   const logout = async () => {
     try {
       await signOut(auth);
       return true;
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error('Logout error:', error);
       throw error;
     }
   };
 
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
-      
+
       if (user) {
         // Get and set user roles
         try {
@@ -52,13 +47,13 @@ export const AuthProvider = ({ children }) => {
             setUserRole(null);
           }
         } catch (error) {
-          console.error("Error getting user role:", error);
+          console.error('Error getting user role:', error);
           setUserRole(null);
         }
       } else {
         setUserRole(null);
       }
-      
+
       setLoading(false);
     });
 
@@ -74,7 +69,7 @@ export const AuthProvider = ({ children }) => {
       }
       return null;
     } catch (error) {
-      console.error("Error getting user role:", error);
+      console.error('Error getting user role:', error);
       return null;
     }
   };
@@ -84,7 +79,7 @@ export const AuthProvider = ({ children }) => {
     userRole,
     getUserRole,
     logout,
-    loading
+    loading,
   };
 
   return (
