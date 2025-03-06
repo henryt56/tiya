@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { createContext, useEffect, useState, useContext } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
