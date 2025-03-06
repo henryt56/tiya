@@ -1,9 +1,9 @@
-function LoginPage() {
-    return (
-        <div>
-            <h1>Log in</h1>
-        </div>
-    );
+import AuthRoute from '../components/Routes/AuthRoute';
+import Login from '../components/login-register/Login';
+export default function LoginPage() {
+  return (
+    <AuthRoute>
+      <Login />
+    </AuthRoute>
+  );
 }
-
-export default LoginPage;

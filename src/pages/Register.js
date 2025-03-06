@@ -1,9 +1,10 @@
-function RegisterPage() {
-    return (
-        <div>
-            <h1>Register</h1>
-        </div>
-    );
-}
+import AuthRoute from '../components/Routes/AuthRoute';
+import Register from '../components/login-register/Register';
 
-export default RegisterPage;
+export default function RegisterPage() {
+  return (
+    <AuthRoute>
+      <Register />
+    </AuthRoute>
+  );
+}

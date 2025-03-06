@@ -1,9 +1,10 @@
-function TutorDashboardPage() {
-    return (
-        <div>
-            <h1>Tutor Dashboard</h1>
-        </div>
-    );
-}
+import ProtectedRoute from '../components/Routes/ProtectedRoute';
+import TutorDashboard from '../components/Dashboards/TutorDashboard';
 
-export default TutorDashboardPage;
+export default function TutorDashboardPage() {
+  return (
+    <ProtectedRoute allowedRoles={['tutor']}>
+      <TutorDashboard />
+    </ProtectedRoute>
+  );
+}
