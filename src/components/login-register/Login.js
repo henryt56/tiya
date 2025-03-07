@@ -1,51 +1,46 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { 
-  getAuth, 
-  signInWithEmailAndPassword 
-} from 'firebase/auth';
-import { 
-  getFirestore, 
-  doc, 
-  getDoc,
-  setDoc 
-} from 'firebase/firestore';
-import { app } from '../../firebaseConfig';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../../firebaseConfig';
+import { getUserData, getUserRole } from '../../context/AuthContext';
 
-const Login = () => {
+export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const router = useRouter();
-  const auth = getAuth(app);
-  const db = getFirestore(app);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       setError('');
       setLoading(true);
-      
+
       // Sign in with Firebase Authentication
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       const user = userCredential.user;
-      
-      console.log("User authenticated:", user.uid);
-      
+
+      console.log('User authenticated:', user.uid);
+
       // Get user role from Firestore
       const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
-      
+
       if (userDoc.exists()) {
         const userData = userDoc.data();
         const role = userData.role;
-        
-        console.log("User document found with role:", role);
-        
+
+        console.log('User document found with role:', role);
+
         // Redirect based on role
         if (role === 'student') {
           router.push('/StudentDashboard');
@@ -59,8 +54,8 @@ const Login = () => {
           router.push('/');
         }
       } else {
-        console.log("User document not found. Creating one...");
-        
+        console.log('User document not found. Creating one...');
+
         // User exists in Auth but not in Firestore
         // Create a basic user profile with student role by default
         try {
@@ -69,13 +64,13 @@ const Login = () => {
             email: user.email,
             role: 'student', // Default role
             displayName: user.displayName || email.split('@')[0],
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           });
-          
-          console.log("Created user document");
+
+          console.log('Created user document');
           router.push('/StudentDashboard');
         } catch (firestoreError) {
-          console.error("Error creating user document:", firestoreError);
+          console.error('Error creating user document:', firestoreError);
           setError('Failed to create user profile: ' + firestoreError.message);
         }
       }
@@ -90,9 +85,9 @@ const Login = () => {
   return (
     <div className="login-container">
       <h2>Log in to Your Tiya Account</h2>
-      
+
       {error && <div className="error-message">{error}</div>}
-      
+
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Email</label>
@@ -103,7 +98,7 @@ const Login = () => {
             required
           />
         </div>
-        
+
         <div className="form-group">
           <label>Password</label>
           <input
@@ -113,21 +108,19 @@ const Login = () => {
             required
           />
         </div>
-        
+
         <div className="forgot-password">
           <Link href="/Forgot-password">Forgot password?</Link>
         </div>
-        
+
         <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Log in"}
+          {loading ? 'Logging in...' : 'Log in'}
         </button>
       </form>
-      
+
       <div className="register-link">
         Don't have an account? <Link href="/Register">Sign up</Link>
       </div>
     </div>
   );
 };
-
-export default Login;
