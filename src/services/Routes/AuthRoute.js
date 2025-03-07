@@ -1,7 +1,7 @@
 // components/AuthRoute.js
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '/../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import PropTypes from 'prop-types';
 
 // AuthRoute is for pages that should only be accessible when NOT logged in

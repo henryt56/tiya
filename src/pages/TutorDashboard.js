@@ -1,4 +1,4 @@
-import ProtectedRoute from '../components/Routes/ProtectedRoute';
+import ProtectedRoute from '../services/Routes/ProtectedRoute';
 import TutorDashboard from '../components/Dashboards/TutorDashboard';
 
 export default function TutorDashboardPage() {
