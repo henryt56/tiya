@@ -1,7 +1,6 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/global.css';
-import { AuthProvider } from '../context/AuthContext.js';
+import { AuthProvider } from '../services/context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../components/Header';
 import { Montserrat } from 'next/font/google';

@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import styles from "./Banner.module.css";
-import { MdOutlineMessage } from "react-icons/md";
-import { CgProfile } from "react-icons/cg";
-import { FiMenu, FiLogOut } from "react-icons/fi";
-import { BiLogIn } from "react-icons/bi";
-import { useAuth } from '../../context/AuthContext';
+import styles from './Banner.module.css';
+import { MdOutlineMessage } from 'react-icons/md';
+import { CgProfile } from 'react-icons/cg';
+import { FiMenu, FiLogOut } from 'react-icons/fi';
+import { BiLogIn } from 'react-icons/bi';
+import { useAuth } from '../../services/context/AuthContext';
 
 export default function Banner() {
   const { currentUser, userRole, logout } = useAuth();
@@ -16,7 +16,7 @@ export default function Banner() {
       await logout();
       router.push('/');
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error('Logout error:', error);
     }
   };
 
@@ -41,14 +41,25 @@ export default function Banner() {
       <div className={styles.bannerContent}>
         {/* Navigation links can go here */}
         <nav className={styles.navigation}>
-          <Link href="/" className={styles.navLink}>Home</Link>
+          <Link href="/" className={styles.navLink}>
+            Home
+          </Link>
           {currentUser && userRole === 'student' && (
-            <Link href="/Search" className={styles.navLink}>Find Tutors</Link>
+            <Link href="/Search" className={styles.navLink}>
+              Find Tutors
+            </Link>
           )}
           {currentUser && userRole === 'tutor' && (
-            <Link href="/Sessions" className={styles.navLink}>My Sessions</Link>
+            <Link href="/Sessions" className={styles.navLink}>
+              My Sessions
+            </Link>
           )}
-          <Link href="/About" className={styles.navLink}>About Us</Link>
+          <Link href="/About" className={styles.navLink}>
+            About Us
+          </Link>
+          <Link href="/Contact" className={styles.navLink}>
+            Contact
+          </Link>
         </nav>
       </div>
 
@@ -58,15 +69,15 @@ export default function Banner() {
             <button className={styles.iconButton} title="Messages">
               <MdOutlineMessage />
             </button>
-            <button 
-              className={styles.iconButton} 
+            <button
+              className={styles.iconButton}
               onClick={handleProfileClick}
               title="Profile"
             >
               <CgProfile />
             </button>
-            <button 
-              className={styles.iconButton} 
+            <button
+              className={styles.iconButton}
               onClick={handleLogout}
               title="Logout"
             >
