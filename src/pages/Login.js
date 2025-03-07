@@ -1,5 +1,5 @@
-import AuthRoute from '../components/Routes/AuthRoute';
-import Login from '../components/login-register/Login';
+import AuthRoute from '../services/Routes/AuthRoute';
+import Login from '../services/login-register/Login';
 
 export default function LoginPage() {
   return (

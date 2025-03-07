@@ -1,4 +1,4 @@
-import ProtectedRoute from '../components/Routes/ProtectedRoute';
+import ProtectedRoute from '../services/Routes/ProtectedRoute';
 import StudentDashboard from '../components/Dashboards/StudentDashboard';
 
 export default function StudentDashboardPage() {
