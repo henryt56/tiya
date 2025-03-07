@@ -5,5 +5,3 @@ function TutorProfilePage() {
     </div>
   );
 }
-
-export default TutorProfilePage;
