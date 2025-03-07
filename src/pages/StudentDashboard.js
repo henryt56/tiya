@@ -1,7 +1,10 @@
+import ProtectedRoute from '../services/Routes/ProtectedRoute';
+import StudentDashboard from '../components/Dashboards/StudentDashboard';
+
 export default function StudentDashboardPage() {
   return (
-    <div>
-      <h1>Student Dashboard</h1>
-    </div>
+    <ProtectedRoute allowedRoles={['student']}>
+      <StudentDashboard />
+    </ProtectedRoute>
   );
 }

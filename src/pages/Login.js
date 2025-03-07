@@ -1,7 +1,10 @@
+import AuthRoute from '../services/Routes/AuthRoute';
+import Login from '../services/login-register/Login';
+
 export default function LoginPage() {
   return (
-    <div>
-      <h1>Log in</h1>
-    </div>
+    <AuthRoute>
+      <Login />
+    </AuthRoute>
   );
 }
