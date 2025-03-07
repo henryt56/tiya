@@ -1,7 +1,10 @@
+import AuthRoute from '../services/Routes/AuthRoute';
+import Register from '../services/login-register/Register';
+
 export default function RegisterPage() {
   return (
-    <div>
-      <h1>Register</h1>
-    </div>
+    <AuthRoute>
+      <Register />
+    </AuthRoute>
   );
 }
