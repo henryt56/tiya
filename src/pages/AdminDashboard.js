@@ -6,4 +6,4 @@ function AdminDashboardPage() {
   );
 }
 
-export default AdminDashboard;
+export default AdminDashboardPage;
