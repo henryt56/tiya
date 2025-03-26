@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 // AuthRoute is for pages that should only be accessible when NOT logged in
 // (like login and register pages)
-export const AuthRoute = ({ children }) => {
+export default AuthRoute = ({ children }) => {
   const { currentUser, loading } = useAuth();
   const router = useRouter();
 
