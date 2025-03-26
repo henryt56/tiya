@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '../context/AuthContext';
-import PropTypes from 'prop-types';
+import { useAuth } from '../../context/AuthContext';
 
-const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+export const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { currentUser, userRole, loading } = useAuth();
   const router = useRouter();
 
@@ -48,10 +47,3 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
   return children;
 };
-
-ProtectedRoute.propTypes = {
-  children: PropTypes.node.isRequired,
-  allowedRoles: PropTypes.arrayOf(PropTypes.string),
-};
-
-export default ProtectedRoute;

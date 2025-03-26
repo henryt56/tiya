@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
-import { app } from '../../firebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../../firebaseConfig';
 
-const Register = () => {
+export const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -16,8 +16,6 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-  const auth = getAuth(app);
-  const db = getFirestore(app);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -176,5 +174,3 @@ const Register = () => {
     </div>
   );
 };
-
-export default Register;

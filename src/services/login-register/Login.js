@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
-import { app } from '../../firebaseConfig';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../../firebaseConfig';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -12,8 +12,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-  const auth = getAuth(app);
-  const db = getFirestore(app);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
