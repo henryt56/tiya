@@ -3,7 +3,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import Link from 'next/link';
 import { auth } from '../firebaseConfig';
 
-export const ForgotPassword = () => {
+export default ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
