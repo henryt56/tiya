@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../context/AuthContext';
 
-export default ProtectedRoute = ({ children, allowedRoles = [] }) => {
+const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { currentUser, userRole, loading } = useAuth();
   const router = useRouter();
 
@@ -47,3 +47,5 @@ export default ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
   return children;
 };
+
+export default ProtectedRoute;
