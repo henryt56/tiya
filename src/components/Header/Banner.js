@@ -5,7 +5,7 @@ import { MdOutlineMessage } from 'react-icons/md';
 import { CgProfile } from 'react-icons/cg';
 import { FiMenu, FiLogOut } from 'react-icons/fi';
 import { BiLogIn } from 'react-icons/bi';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../services/context/AuthContext';
 
 export default function Banner() {
   const { currentUser, userRole, logout } = useAuth();
@@ -56,6 +56,9 @@ export default function Banner() {
           )}
           <Link href="/About" className={styles.navLink}>
             About Us
+          </Link>
+          <Link href="/Contact" className={styles.navLink}>
+            Contact
           </Link>
         </nav>
       </div>
