@@ -1,5 +1,5 @@
-import ProtectedRoute from '../services/Routes/ProtectedRoute';
-import StudentDashboard from '../components/Dashboards/StudentDashboard';
+import { ProtectedRoute } from '../services/Routes/ProtectedRoute.js';
+import { StudentDashboard } from '../components/Dashboards/StudentDashboard';
 
 export default function StudentDashboardPage() {
   return (
