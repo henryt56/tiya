@@ -5,8 +5,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebaseConfig';
 
-
-export  const Login = () => {
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -119,8 +118,10 @@ export  const Login = () => {
       </form>
 
       <div className="register-link">
-        Don't have an account? <Link href="/Register">Sign up</Link>
+        Don&rsquo;t have an account? <Link href="/Register">Sign up</Link>
       </div>
     </div>
   );
 };
+
+export default Login;
