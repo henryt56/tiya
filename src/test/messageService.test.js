@@ -4,9 +4,9 @@ import {
   getUsersConversation,
   markAsRead,
   listenToConversation,
-} from './messageService';
+} from '../services/Messages/messageService';
 
-jest.mock('../../firebaseConfig', () => ({
+jest.mock('../firebaseConfig', () => ({
   db: {
     collection: jest.fn(() => ({
       where: jest.fn().mockReturnThis(),
