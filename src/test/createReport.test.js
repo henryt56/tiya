@@ -59,14 +59,14 @@ const mockReportCreation = ({ onSubmit }) => {
 };
 
 // Creates a mock of the above component for testing
-jest.mock('../components/ReportCreation', () => {
+jest.mock('@/components/ReportCreation', () => {
   return {
     __esModule: true,
     default: jest.fn((props) => mockReportCreation(props)),
   };
 });
 
-import ReportCreation from '../components/ReportCreation';
+import ReportCreation from '@/components/ReportCreation';
 
 describe('Tutor Report Creation Feature', () => {
   const mockSubmitReport = jest.fn();
