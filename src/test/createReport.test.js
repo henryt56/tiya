@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import ReportCreation from '../components/Reports/ReportCreation';
 
 // Component for Report Creation does NOT exist yet
 // Thus, mockReportCreation is a mock of (what I expect of) ReportCreation
@@ -59,14 +60,12 @@ const mockReportCreation = ({ onSubmit }) => {
 };
 
 // Creates a mock of the above component for testing
-jest.mock('@/components/ReportCreation', () => {
+jest.mock('../components/Reports/ReportCreation', () => {
   return {
     __esModule: true,
     default: jest.fn((props) => mockReportCreation(props)),
   };
 });
-
-import ReportCreation from '@/components/ReportCreation';
 
 describe('Tutor Report Creation Feature', () => {
   const mockSubmitReport = jest.fn();
