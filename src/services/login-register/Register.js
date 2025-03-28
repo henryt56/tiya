@@ -113,8 +113,9 @@ const Register = () => {
 
         <div className="form-row">
           <div className="form-group">
-            <label>First Name</label>
+            <label htmlFor="first-name">First Name</label>
             <input
+              id="first-name"
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -123,8 +124,9 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label>Last Name</label>
+            <label htmlFor="last-name">Last Name</label>
             <input
+              id="last-name"
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -134,8 +136,9 @@ const Register = () => {
         </div>
 
         <div className="form-group">
-          <label>Email</label>
+          <label htmlFor="email">Email</label>
           <input
+            id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -144,8 +147,9 @@ const Register = () => {
         </div>
 
         <div className="form-group">
-          <label>Password</label>
+          <label htmlFor="password">Password</label>
           <input
+            id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -154,8 +158,9 @@ const Register = () => {
         </div>
 
         <div className="form-group">
-          <label>Confirm Password</label>
+          <label htmlFor="confirm-password">Confirm Password</label>
           <input
+            id="confirm-password"
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
