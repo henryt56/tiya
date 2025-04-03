@@ -52,6 +52,7 @@ const Register = () => {
           lastName,
           displayName: `${firstName} ${lastName}`,
           role,
+          profileComplete: false, // Add this flag to track profile completion
           createdAt: new Date().toISOString(),
         });
 
@@ -61,7 +62,8 @@ const Register = () => {
         if (role === 'student') {
           router.push('/StudentDashboard');
         } else if (role === 'tutor') {
-          router.push('/TutorDashboard');
+          // Redirect tutors to profile setup page
+          router.push('/TutorProfile');
         }
       } catch (firestoreError) {
         console.error('Firestore error:', firestoreError);
