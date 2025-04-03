@@ -1,0 +1,90 @@
+.loginContainer {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.loginContainer h2 {
+  font-size: 36px;
+  font-weight: 600;
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.errorMessage {
+  color: #ff0066;
+  font-size: 14px;
+  margin-top: -10px;
+  margin-bottom: 15px;
+}
+
+.forgotPassword {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.forgotPassword a {
+  color: #666;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.forgotPassword a:hover {
+  text-decoration: none;
+}
+
+.loginButton {
+  width: 100%;
+  background-color: #66bbff;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background-color 0.3s;
+}
+
+.loginButton:hover {
+  background-color: #55aaff;
+}
+
+.loginButton:disabled {
+  background-color: #aaddff;
+  cursor: not-allowed;
+}
+
+.registerLink {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.registerLink a {
+  color: #66bbff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.registerLink a:hover {
+  text-decoration: underline;
+}
