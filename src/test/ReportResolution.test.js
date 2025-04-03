@@ -35,7 +35,7 @@ jest.mock('../components/Reports/ReportResolution', () => {
   };
 });
 
-import ReportResolution from '../components/Reports/ReportResolution';
+import ReportResolution from '../services/Reports/ReportResolution';
 
 describe('IT/Admin Report Resolution Feature', () => {
   const mockReports = [
