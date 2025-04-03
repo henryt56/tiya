@@ -15,31 +15,5 @@ h2 {
 }
 
 p {
-  font-size: 24px;
-}
-
-.quote {
-  font-weight: bold;
-  font-size: 48px;
-  letter-spacing: -2%;
-  text-align: right;
-}
-
-.how-tiya-works-button {
-  width: 442px;
-  height: 77px;
-  padding: 12px;
-  color: white;
-  background-color: rgba(56, 71, 83, 1);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-}
-
-.sign-up-button {
-  background-color: rgba(97, 187, 251, 1);
-  padding: 24px;
-  color: white;
-  font-size: 32px;
-  width: 583px;
-  height: 78px;
-  border-radius: 9999px;
+  font-size: 2rem;
 }
