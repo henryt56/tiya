@@ -9,6 +9,27 @@
   width: 100%;
 }
 
+.bannerContent {
+  display: flex;
+  align-items: center;
+}
+
+.navigation {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navLink {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover {
+  color: #eee;
+}
+
 .navIcons {
   display: flex;
   gap: 0.75rem;
@@ -21,9 +42,45 @@
   cursor: pointer;
   padding: 0.25rem;
   font-size: 20px;
+  color: #fff;
+  transition: color 0.2s ease;
+}
+
+.iconButton:hover {
+  color: #eee;
 }
 
 .iconButton img {
   width: 1.25rem;
   height: 1.25rem;
+}
+
+.authLink {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 0.25rem 0.5rem;
+}
+
+.authLink:hover {
+  color: #eee;
+}
+
+.authIcon {
+  font-size: 18px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .navLink {
+    display: none;
+  }
+  
+  .authLink span {
+    display: none;
+  }
 }
