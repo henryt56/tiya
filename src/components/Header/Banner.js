@@ -5,24 +5,13 @@ import { CgProfile } from 'react-icons/cg';
 import { FiMenu } from 'react-icons/fi';
 
 export default function Banner() {
-<<<<<<< Updated upstream
-  // WILL LATER IMPLEMENT FUNCTIONALITY TO ICON BUTTONS
-=======
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-  // WILL LATER IMPLEMENT FUNCTIONALITY TO ICON BUTTONS
-=======
->>>>>>> Stashed changes
   const { currentUser, userRole, logout } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
     try {
       await logout();
-<<<<<<< Updated upstream
       router.push('/');
-=======
       if (router.pathname === '/') {
         // Next.js by default will run an error if the user tries
         // redirect to the same page in order to prevent degradation of performance
@@ -32,7 +21,6 @@ export default function Banner() {
       } else {
         router.push('/');
       }
->>>>>>> Stashed changes
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -54,11 +42,6 @@ export default function Banner() {
     }
   };
 
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   return (
     <div className={styles.banner}>
       <div className={styles.bannerContent}></div>
