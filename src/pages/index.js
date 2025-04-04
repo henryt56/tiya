@@ -2,8 +2,10 @@ import styles from '../styles/HomePage.module.css';
 import Image from 'next/image';
 import image from '../../public/images/student-studying.png';
 import SearchBar from '../components/SearchBar/SearchBar';
+import { useRouter } from 'next/router';
 
 function HomePage() {
+  const router = useRouter();
   return (
     <div className={styles.container}>
       <div className={styles.topsection}>
@@ -42,7 +44,12 @@ function HomePage() {
             </p>
           </section>
         </div>
-        <button className={styles.signUpButton}>SIGN UP TODAY</button>
+        <button
+          className={styles.signUpButton}
+          onClick={() => router.push('/Register')}
+        >
+          SIGN UP TODAY
+        </button>
       </div>
       <div className={styles.bottomsection}>
         <section>
