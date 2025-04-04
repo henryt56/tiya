@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { AuthProvider } from '../services/context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../components/Header';
+import Footer from '../components/Footer'; // ✅ Correct import now
 import { Montserrat } from 'next/font/google';
 
 const montserrat = Montserrat({
@@ -18,6 +19,7 @@ function MyApp({ Component, pageProps }) {
       <main className={montserrat.className}>
         <Header />
         <Component {...pageProps} />
+        <Footer />
       </main>
     </AuthProvider>
   );
