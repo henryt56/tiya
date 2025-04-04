@@ -15,6 +15,15 @@ export default function Banner() {
     try {
       await logout();
       router.push('/');
+      if (router.pathname === '/') {
+        // Next.js by default will run an error if the user tries
+        // redirect to the same page in order to prevent degradation of performance
+        // Thus, I add a conditional so that if they are on the root dir and try to logout,
+        // then logout, reload the page, otherwise, logout and redirect to home page
+        window.location.reload();
+      } else {
+        router.push('/');
+      }
     } catch (error) {
       console.error('Logout error:', error);
     }
