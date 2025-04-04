@@ -149,7 +149,7 @@ const Login = () => {
         <div className="text-center mt-3">
           Don&apos;t have an account?{' '}
           <Link
-            href="/register"
+            href="/Register"
             className="text-decoration-none"
             style={{ color: '#67c2ff' }}
           >
