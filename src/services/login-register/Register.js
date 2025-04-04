@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebaseConfig';
 
-export const Register = () => {
+const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -80,11 +80,14 @@ export const Register = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-      <div className="bg-white p-4 rounded shadow" style={{ maxWidth: '500px', width: '100%' }}>
+      <div
+        className="bg-white p-4 rounded shadow"
+        style={{ maxWidth: '500px', width: '100%' }}
+      >
         <h2 className="text-center mb-4">Create Your Tiya Account</h2>
-        
+
         {error && <div className="alert alert-danger">{error}</div>}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">I am a:</label>
@@ -119,10 +122,12 @@ export const Register = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="row mb-3">
             <div className="col-md-6 mb-3 mb-md-0">
-              <label htmlFor="firstName" className="form-label">First Name</label>
+              <label htmlFor="firstName" className="form-label">
+                First Name
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -133,7 +138,9 @@ export const Register = () => {
               />
             </div>
             <div className="col-md-6">
-              <label htmlFor="lastName" className="form-label">Last Name</label>
+              <label htmlFor="lastName" className="form-label">
+                Last Name
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -144,9 +151,11 @@ export const Register = () => {
               />
             </div>
           </div>
-          
+
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">Email</label>
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
             <input
               type="email"
               className="form-control"
@@ -156,9 +165,11 @@ export const Register = () => {
               required
             />
           </div>
-          
+
           <div className="mb-3">
-            <label htmlFor="password" className="form-label">Password</label>
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
             <input
               type="password"
               className="form-control"
@@ -168,9 +179,11 @@ export const Register = () => {
               required
             />
           </div>
-          
+
           <div className="mb-4">
-            <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+            <label htmlFor="confirmPassword" className="form-label">
+              Confirm Password
+            </label>
             <input
               type="password"
               className="form-control"
@@ -180,21 +193,34 @@ export const Register = () => {
               required
             />
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="btn w-100 py-2 mb-3"
-            style={{ backgroundColor: '#67c2ff', borderColor: '#67c2ff', color: 'white' }}
+            style={{
+              backgroundColor: '#67c2ff',
+              borderColor: '#67c2ff',
+              color: 'white',
+            }}
             disabled={loading}
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
-        
+
         <div className="text-center">
-          Already have an account? <Link href="/login" className="text-decoration-none" style={{ color: '#67c2ff' }}>Log in</Link>
+          Already have an account?{' '}
+          <Link
+            href="/login"
+            className="text-decoration-none"
+            style={{ color: '#67c2ff' }}
+          >
+            Log in
+          </Link>
         </div>
       </div>
     </div>
   );
 };
+
+export default Register;

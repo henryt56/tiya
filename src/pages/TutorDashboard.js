@@ -1,5 +1,5 @@
-import { ProtectedRoute } from '../components/Routes/ProtectedRoute.js';
-import  TutorDashboard from '../components/Dashboards/TutorDashboard';
+import ProtectedRoute from '../services/Routes/ProtectedRoute';
+import TutorDashboard from '../components/Dashboards/TutorDashboard';
 
 export default function TutorDashboardPage() {
   return (
