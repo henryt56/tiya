@@ -4,10 +4,7 @@ import Link from 'next/link';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebaseConfig';
-<<<<<<< Updated upstream
-=======
 import styles from './Login.module.css';
->>>>>>> Stashed changes
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -79,9 +76,6 @@ const Login = () => {
       }
     } catch (error) {
       console.error('Login error:', error);
-<<<<<<< Updated upstream
-      setError('Failed to log in: ' + error.message);
-=======
       if (error.code === 'auth/invalid-credential') {
         setError('Invalid email or password. Please try again.');
       } else if (error.code === 'auth/user-not-found') {
@@ -95,22 +89,12 @@ const Login = () => {
       } else {
         setError('Failed to log in: ' + error.message);
       }
->>>>>>> Stashed changes
     } finally {
       setLoading(false);
     }
   };
 
   return (
-<<<<<<< Updated upstream
-    <div className="login-container">
-      <h2>Log in to Your Tiya Account</h2>
-
-      {error && <div className="error-message">{error}</div>}
-
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-=======
     <div className={styles.loginContainer}>
       <h2>Log in</h2>
 
@@ -118,7 +102,6 @@ const Login = () => {
 
       <form onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
->>>>>>> Stashed changes
           <label>Email</label>
           <input
             type="email"
@@ -128,11 +111,7 @@ const Login = () => {
           />
         </div>
 
-<<<<<<< Updated upstream
-        <div className="form-group">
-=======
         <div className={styles.formGroup}>
->>>>>>> Stashed changes
           <label>Password</label>
           <input
             type="password"
@@ -142,28 +121,16 @@ const Login = () => {
           />
         </div>
 
-<<<<<<< Updated upstream
-        <div className="forgot-password">
-          <Link href="/Forgot-password">Forgot password?</Link>
-        </div>
-
-        <button type="submit" disabled={loading}>
-=======
         <div className={styles.forgotPassword}>
           <Link href="/Forgot-password">Forgot Password?</Link>
         </div>
 
         <button type="submit" disabled={loading} className={styles.loginButton}>
->>>>>>> Stashed changes
           {loading ? 'Logging in...' : 'Log in'}
         </button>
       </form>
 
-<<<<<<< Updated upstream
-      <div className="register-link">
-=======
       <div className={styles.registerLink}>
->>>>>>> Stashed changes
         Don&rsquo;t have an account? <Link href="/Register">Sign up</Link>
       </div>
     </div>
