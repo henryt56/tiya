@@ -1,0 +1,66 @@
+.searchPage {
+  font-family: 'Montserrat', sans-serif;
+  padding: 2rem;
+}
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.filterBar label {
+  margin-right: 0.3rem;
+}
+
+.filterBar select {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.cardSmallBox {
+  background-color: #f3f3f3;
+  border-radius: 16px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 280px;
+  overflow: hidden;
+}
+
+.cardImageSmall {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: 12px;
+}
+
+.cardContentSmall {
+  padding-top: 0.75rem;
+  text-align: center;
+  font-size: 14px;
+}
+
+.detail {
+  color: #444;
+  margin: 2px 0;
+  font-size: 13px;
+}
