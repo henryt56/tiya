@@ -1,12 +1,11 @@
 .footer {
-  background-color: #FFFFFF; 
+  background-color: #FFFFFF;
   border-top: 1px solid #E0E0E0;
   padding: 40px 20px 20px;
   font-family: var(--font-montserrat);
   font-size: 14px;
   color: #333;
 }
-
 
 .footerTop {
   display: flex;
@@ -60,7 +59,9 @@
 
 .footerBottom {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;  /* aligns to the left */
+  max-width: 1200px;
+  margin: 0 auto;
   padding-top: 20px;
 }
 
