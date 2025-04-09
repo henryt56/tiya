@@ -1,11 +1,10 @@
-import React from 'react';
+import AuthRoute from '../services/Routes/AuthRoute';
+import Register from '../services/login-register/Register';
 
-function RegisterPage() {
+export default function RegisterPage() {
   return (
-    <div>
-      <h1>Register</h1>
-    </div>
+    <AuthRoute>
+      <Register />
+    </AuthRoute>
   );
 }
-
-export default RegisterPage;

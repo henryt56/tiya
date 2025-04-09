@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './Header.module.css';
 import Logo from './Logo';
 import Banner from './Banner.js';
