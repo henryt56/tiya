@@ -1,66 +1,63 @@
-.searchPage {
-  font-family: 'Montserrat', sans-serif;
-  padding: 2rem;
+.search-page {
+  font-family: sans-serif;
+  padding: 1rem;
 }
 
-.filterBar {
+.search-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  font-weight: 500;
+  background: #3b82f6;
+  padding: 1rem 2rem;
+  color: white;
+  border-radius: 10px;
 }
 
-.filterBar label {
-  margin-right: 0.3rem;
+.search-input {
+  width: 50%;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: none;
 }
 
-.filterBar select {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  background-color: #fff;
-  cursor: pointer;
+.icons span {
+  margin-left: 1rem;
+  font-size: 1.25rem;
 }
 
-.gridContainer {
+.filter-bar {
+  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+}
+
+.grid-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 2rem;
   max-width: 1200px;
   margin: auto;
 }
 
-.cardSmallBox {
-  background-color: #f3f3f3;
+.card {
+  background: #f9f9f9;
   border-radius: 16px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
-  padding: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  height: 280px;
-  overflow: hidden;
+  height: 300px;
 }
 
-.cardImageSmall {
-  width: 100%;
-  height: 120px;
+.card-image {
+  height: 160px;
   object-fit: cover;
-  object-position: center center;
-  border-radius: 12px;
+  width: 100%;
 }
 
-.cardContentSmall {
-  padding-top: 0.75rem;
-  text-align: center;
-  font-size: 14px;
-}
-
-.detail {
-  color: #444;
-  margin: 2px 0;
-  font-size: 13px;
+.card-content {
+  padding: 1rem;
+  flex-grow: 1;
 }
