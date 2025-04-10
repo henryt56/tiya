@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import styles from '../styles/Search.module.css';
 
 const tutors = [
-  { name: 'Emily Johnson', subject: 'English', certifications: 'TESOL Certified', language: 'English', availability: 'Weekdays', rating: 4.5, price: 35, location: 'Atlanta, GA', image: 'https://randomuser.me/api/portraits/women/44.jpg' },
+  { name: 'Emily Johnson', subject: 'Reading & Writing', certifications: 'TESOL Certified', language: 'English', availability: 'Weekdays', rating: 4.5, price: 35, location: 'Atlanta, GA', image: 'https://randomuser.me/api/portraits/women/44.jpg' },
   { name: 'Michael Smith', subject: 'Mathematics', certifications: 'Math Masters', language: 'English', availability: 'Weekends', rating: 4.2, price: 25, location: 'Decatur, GA', image: 'https://randomuser.me/api/portraits/men/32.jpg' },
   { name: 'Ava Williams', subject: 'Science', certifications: 'STEM Scholar', language: 'Spanish', availability: 'Evenings', rating: 4.7, price: 40, location: 'Marietta, GA', image: 'https://randomuser.me/api/portraits/women/65.jpg' },
   { name: 'Liam Brown', subject: 'History', certifications: 'Social Studies Credential', language: 'English', availability: 'Weekdays', rating: 4.0, price: 20, location: 'Gwinnett, GA', image: 'https://randomuser.me/api/portraits/men/83.jpg' },
-  { name: 'Sophia Davis', subject: 'English', certifications: 'Reading Specialist', language: 'French', availability: 'Weekends', rating: 4.8, price: 45, location: 'Sandy Springs, GA', image: 'https://randomuser.me/api/portraits/women/51.jpg' },
+  { name: 'Sophia Davis', subject: 'Reading & Writing', certifications: 'Reading Specialist', language: 'French', availability: 'Weekends', rating: 4.8, price: 45, location: 'Sandy Springs, GA', image: 'https://randomuser.me/api/portraits/women/51.jpg' },
   { name: 'Ethan Wilson', subject: 'Mathematics', certifications: 'SAT Math Pro', language: 'English', availability: 'Evenings', rating: 4.3, price: 30, location: 'Roswell, GA', image: 'https://randomuser.me/api/portraits/men/77.jpg' },
   { name: 'Isabella Moore', subject: 'Science', certifications: 'Biology Olympiad Finalist', language: 'Spanish', availability: 'Weekdays', rating: 4.6, price: 38, location: 'Peachtree City, GA', image: 'https://randomuser.me/api/portraits/women/36.jpg' },
   { name: 'James Anderson', subject: 'History', certifications: 'US History Certified', language: 'German', availability: 'Weekends', rating: 3.9, price: 18, location: 'Athens, GA', image: 'https://randomuser.me/api/portraits/men/12.jpg' },
-  { name: 'Olivia Taylor', subject: 'English', certifications: 'Grammar Guru', language: 'English', availability: 'Evenings', rating: 4.4, price: 27, location: 'Macon, GA', image: 'https://randomuser.me/api/portraits/women/19.jpg' }
+  { name: 'Olivia Taylor', subject: 'Reading & Writing', certifications: 'Grammar Guru', language: 'English', availability: 'Evenings', rating: 4.4, price: 27, location: 'Macon, GA', image: 'https://randomuser.me/api/portraits/women/19.jpg' }
 ];
+
 
 export default function Search() {
   const [selectedSubject, setSelectedSubject] = useState('All');
