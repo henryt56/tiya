@@ -11,6 +11,7 @@ import {
   updateDoc,
   doc,
 } from 'firebase/firestore';
+import { getUserData } from '../context/AuthContext';
 
 export const sendMessage = async (
   senderId,
@@ -18,14 +19,30 @@ export const sendMessage = async (
   receiverId,
   receiverName,
   content,
-  attachments = [],
+  attachments = [], // Currently not implemented in messaging UI
 ) => {
   try {
+    const senderData = await getUserData(senderId);
+    const receiverData = await getUserData(receiverId);
+
+    if (!senderData || !receiverData) {
+      throw new Error('User not found');
+    }
+
+    const senderRole = senderData.role;
+    const receiverRole = receiverData.role;
+
+    const isAllowed =
+      (senderRole === 'student' && receiverRole === 'tutor') ||
+      (senderRole === 'tutor' && receiverRole === 'student');
+
     const messageData = {
       senderId,
       senderName,
+      senderRole,
       receiverId,
       receiverName,
+      receiverRole,
       messageContent: content,
       timestampCreated: serverTimestamp(),
       isRead: false,
@@ -67,11 +84,14 @@ export const getUserMessageHistory = async (userId) => {
       const partnerId = msg.senderId == userId ? msg.receiverId : msg.senderId;
       const partnerName =
         msg.senderId == userId ? msg.receiverName : msg.senderName;
+      const partnerRole =
+        msg.senderId == userId ? msg.receiverRole : msg.senderRole;
 
       if (!messagehistoryMap[partnerId]) {
         messagehistoryMap[partnerId] = {
           partnerId,
           partnerName,
+          partnerRole,
           messages: [],
         };
       }
