@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import styles from './Banner.module.css';
-import { MdOutlineMessage } from 'react-icons/md';
 import { CgProfile } from 'react-icons/cg';
 import { FiMenu, FiLogOut } from 'react-icons/fi';
 import { BiLogIn } from 'react-icons/bi';
@@ -100,9 +99,6 @@ export default function Banner() {
         <div className={styles.navIcons}>
           {currentUser ? (
             <>
-              <button className={styles.iconButton} title="Messages">
-                <MdOutlineMessage />
-              </button>
               <button
                 className={styles.iconButton}
                 onClick={handleProfileClick}
