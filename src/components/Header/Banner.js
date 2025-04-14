@@ -6,10 +6,13 @@ import { CgProfile } from 'react-icons/cg';
 import { FiMenu, FiLogOut } from 'react-icons/fi';
 import { BiLogIn } from 'react-icons/bi';
 import { useAuth } from '../../services/context/AuthContext';
+import { useState, useRef, useEffect } from 'react';
 
 export default function Banner() {
   const { currentUser, userRole, logout } = useAuth();
   const router = useRouter();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleLogout = async () => {
     try {
@@ -45,69 +48,146 @@ export default function Banner() {
     }
   };
 
+  const handleDropdownMenu = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target) &&
+        !e.target.closest(`.${styles.dropdownMenu}`)
+      ) {
+        setShowDropdown(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className={styles.banner}>
-      <div className={styles.bannerContent}>
-        {/* Navigation links can go here */}
-        <nav className={styles.navigation}>
-          <Link href="/" className={styles.navLink}>
+    <>
+      <div className={styles.banner}>
+        <div className={styles.bannerContent}>
+          {/* Navigation links can go here */}
+          <nav className={styles.navigation}>
+            <Link href="/" className={styles.navLink}>
+              Home
+            </Link>
+            {currentUser && userRole === 'student' && (
+              <Link href="/Search" className={styles.navLink}>
+                Find Tutors
+              </Link>
+            )}
+            {currentUser && userRole === 'tutor' && (
+              <Link href="/Sessions" className={styles.navLink}>
+                My Sessions
+              </Link>
+            )}
+            <Link href="/About" className={styles.navLink}>
+              About Us
+            </Link>
+            <Link href="/Contact" className={styles.navLink}>
+              Contact
+            </Link>
+          </nav>
+        </div>
+
+        <div className={styles.navIcons}>
+          {currentUser ? (
+            <>
+              <button className={styles.iconButton} title="Messages">
+                <MdOutlineMessage />
+              </button>
+              <button
+                className={styles.iconButton}
+                onClick={handleProfileClick}
+                title="Profile"
+              >
+                <CgProfile />
+              </button>
+              <button
+                className={styles.iconButton}
+                onClick={handleLogout}
+                title="Logout"
+              >
+                <FiLogOut />
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/Login" className={styles.authLink}>
+                <BiLogIn className={styles.authIcon} />
+                <span>Login</span>
+              </Link>
+              <Link href="/Register" className={styles.authLink}>
+                <span>Register</span>
+              </Link>
+            </>
+          )}
+          <button
+            onClick={handleDropdownMenu}
+            className={`${styles.iconButton} ${styles.dropdownMenu}`}
+            title="Menu"
+          >
+            <FiMenu />
+          </button>
+        </div>
+      </div>
+
+      {showDropdown && (
+        <div className={styles.dropdown} ref={dropdownRef}>
+          <Link href="/" className={styles.dropdownLink}>
             Home
           </Link>
+
           {currentUser && userRole === 'student' && (
-            <Link href="/Search" className={styles.navLink}>
+            <Link href="/Search" className={styles.dropdownLink}>
               Find Tutors
             </Link>
           )}
+
           {currentUser && userRole === 'tutor' && (
-            <Link href="/Sessions" className={styles.navLink}>
+            <Link href="/Sessions" className={styles.dropdownLink}>
               My Sessions
             </Link>
           )}
-          <Link href="/About" className={styles.navLink}>
+
+          <Link href="/About" className={styles.dropdownLink}>
             About Us
           </Link>
-          <Link href="/Contact" className={styles.navLink}>
+
+          <Link href="/Contact" className={styles.dropdownLink}>
             Contact
           </Link>
-        </nav>
-      </div>
 
-      <div className={styles.navIcons}>
-        {currentUser ? (
-          <>
-            <button className={styles.iconButton} title="Messages">
-              <MdOutlineMessage />
-            </button>
-            <button
-              className={styles.iconButton}
-              onClick={handleProfileClick}
-              title="Profile"
+          {currentUser ? (
+            <a
+              href="#"
+              className={styles.dropdownLink}
+              onClick={(e) => {
+                e.preventDefault();
+                handleLogout();
+              }}
             >
-              <CgProfile />
-            </button>
-            <button
-              className={styles.iconButton}
-              onClick={handleLogout}
-              title="Logout"
-            >
-              <FiLogOut />
-            </button>
-          </>
-        ) : (
-          <>
-            <Link href="/Login" className={styles.authLink}>
-              <BiLogIn className={styles.authIcon} />
-              <span>Login</span>
-            </Link>
-            <Link href="/Register" className={styles.authLink}>
-              <span>Register</span>
-            </Link>
-          </>
-        )}
-        <button className={styles.iconButton} title="Menu">
-          <FiMenu />
-        </button>
-      </div>
-    </div>
+              Logout
+            </a>
+          ) : (
+            <>
+              <Link href="/Login" className={styles.dropdownLink}>
+                Login
+              </Link>
+              <Link href="/Register" className={styles.dropdownLink}>
+                Register
+              </Link>
+            </>
+          )}
+        </div>
+      )}
+    </>
   );
 }
