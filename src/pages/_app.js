@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer'; // ✅ Correct import now
 import { Montserrat } from 'next/font/google';
+import MessageIcon from '../components/Messaging/MessageIcon';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -20,6 +21,7 @@ function MyApp({ Component, pageProps }) {
         <Header />
         <Component {...pageProps} />
         <Footer />
+        <MessageIcon />
       </main>
     </AuthProvider>
   );
