@@ -1,9 +1,10 @@
-function LoginPage() {
-    return (
-        <div>
-            <h1>Log in</h1>
-        </div>
-    );
-}
+import AuthRoute from '../services/Routes/AuthRoute.js';
+import Login from '../services/login-register/Login.js';
 
-export default LoginPage;
+export default function LoginPage() {
+  return (
+    <AuthRoute>
+      <Login />
+    </AuthRoute>
+  );
+}

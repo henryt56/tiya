@@ -1,0 +1,56 @@
+/* Add or replace these in Search.module.css */
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+  gap: 2rem;
+  padding: 2rem;
+  justify-items: center;
+}
+
+.cardSmallBox {
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  padding: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.cardSmallBox:hover {
+  transform: translateY(-5px);
+}
+
+.cardImageSmall {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 1rem;
+}
+
+.cardContentSmall {
+  padding-top: 1rem;
+}
+
+.detail {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+}
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem; /* this creates spacing BETWEEN filter groups */
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  align-items: center;
+}
+
+.filterBar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem; /* keeps label and select on the same line with a little space */
+}

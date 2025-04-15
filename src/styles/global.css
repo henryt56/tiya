@@ -1,0 +1,19 @@
+/* Keep in mind all of the dimensions I used here are from the wireframe, 
+so it's possible that they will require adjustment during implementation */
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+  font-size: 64px;
+}
+
+h2 {
+  font-size: 48px;
+}
+
+p {
+  font-size: 2rem;
+}
