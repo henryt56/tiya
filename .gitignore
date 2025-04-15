@@ -26,6 +26,7 @@ yarn-error.log*
 .firebase/
 service-account.json
 .firebaserc
+firebase-tutor-import/serviceAccountKey.json
 
 # Ignore Firebase config if it contains sensitive keys
 src/firebaseConfig.js
