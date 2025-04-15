@@ -125,6 +125,10 @@ const MessageIcon = () => {
     return date.toLocaleDateString();
   };
 
+  if (loading || (userRole !== 'student' && userRole !== 'tutor')) {
+    return null;
+  }
+
   return (
     <div className={styles.messageIconContainer}>
       <div
