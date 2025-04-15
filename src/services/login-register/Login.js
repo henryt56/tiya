@@ -123,7 +123,7 @@ const Login = () => {
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div>
               <Link
-                href="/forgot-password"
+                href="/Forgot-password"
                 className="text-decoration-none"
                 style={{ color: '#67c2ff' }}
               >
