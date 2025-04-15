@@ -6,7 +6,7 @@ import ChatBox from './ChatBox';
 import styles from './MessageIcon.module.css';
 
 const MessageIcon = () => {
-  const { currentUser, userRole } = useAuth();
+  const { currentUser, userRole, loading } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
   const [chatOpen, setChatOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
