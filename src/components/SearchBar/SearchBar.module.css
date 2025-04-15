@@ -2,21 +2,23 @@
   position: relative;
   width: 100%;
   max-width: 380px;
+  margin: 0 auto;
 }
 
 .searchInput {
   width: 100%;
-  padding: 8px 12px 8px 36px;
+  padding: 10px 12px 10px 36px;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   background-color: #f1f1f1;
-  font-size: 14px;
+  font-size: 15px;
   color: #333;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .searchInput:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(220, 220, 220, 0.5);
+  box-shadow: 0 0 0 2px rgba(0, 128, 255, 0.25);
 }
 
 .searchInput::placeholder {
@@ -34,9 +36,7 @@
   pointer-events: none;
 }
 
-/* I have the search button as invisible since I styled the SearchBar to not use 
-a button as per our wireframe on Figma. I left it alone since it had some test functionality
-attached to it, which is why I made it invisible. */
+/* Button remains invisible for layout/testing reasons */
 .searchButton {
   position: absolute;
   right: 0;

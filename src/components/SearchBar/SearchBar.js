@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from './SearchBar.module.css';
+import { useRouter } from 'next/router';
 
-function SearchBar({ onSearch }) {
+function SearchBar({ onSearch = () => {} }) { // 👈 DEFAULT PROP FIX
   const [subject, setSubject] = useState('');
+  const router = useRouter();
 
   const handleSearch = () => {
-    onSearch(subject); // Reminder: Actual onSearch functionality not yet implemented
+    if (subject.trim() !== '') {
+      onSearch(subject);
+      router.push(`/Search?q=${encodeURIComponent(subject)}`);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -51,7 +56,7 @@ function SearchBar({ onSearch }) {
 }
 
 SearchBar.propTypes = {
-  onSearch: PropTypes.func.isRequired,
+  onSearch: PropTypes.func,
 };
 
 export default SearchBar;
