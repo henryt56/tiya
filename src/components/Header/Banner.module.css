@@ -1,3 +1,4 @@
+
 .banner {
   background-color: #67c2ff;
   border-radius: 9999px;
@@ -7,7 +8,10 @@
   align-items: center;
   padding: 0 1.25rem;
   width: 100%;
+  position: relative; 
+  z-index: 10;       
 }
+
 
 .bannerContent {
   display: flex;

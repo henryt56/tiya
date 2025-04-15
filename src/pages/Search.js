@@ -1,114 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/Search.module.css';
 import { useRouter } from 'next/router';
-
-
-const tutors = [
-  {
-    name: 'Michael Smith',
-    subject: 'Mathematics',
-    certifications: 'Math Masters',
-    language: 'English',
-    availability: 'Weekends',
-    rating: 4.2,
-    price: 25,
-    location: 'Decatur, GA',
-    image: 'https://randomuser.me/api/portraits/men/32.jpg'
-  },
-  {
-    name: 'Emily Johnson',
-    subject: 'Reading & Writing',
-    certifications: 'TESOL Certified',
-    language: 'English',
-    availability: 'Weekdays',
-    rating: 4.5,
-    price: 35,
-    location: 'Atlanta, GA',
-    image: 'https://randomuser.me/api/portraits/women/44.jpg'
-  },
-  {
-    name: 'Ava Williams',
-    subject: 'Science',
-    certifications: 'STEM Scholar',
-    language: 'Spanish',
-    availability: 'Evenings',
-    rating: 4.7,
-    price: 40,
-    location: 'Marietta, GA',
-    image: 'https://randomuser.me/api/portraits/women/65.jpg'
-  },
-  {
-    name: 'Liam Brown',
-    subject: 'History',
-    certifications: 'Social Studies Credential',
-    language: 'English',
-    availability: 'Weekdays',
-    rating: 4.0,
-    price: 20,
-    location: 'Gwinnett, GA',
-    image: 'https://randomuser.me/api/portraits/men/83.jpg'
-  },
-  {
-    name: 'Sophia Davis',
-    subject: 'Reading & Writing',
-    certifications: 'Reading Specialist',
-    language: 'French',
-    availability: 'Weekends',
-    rating: 4.8,
-    price: 45,
-    location: 'Sandy Springs, GA',
-    image: 'https://randomuser.me/api/portraits/women/51.jpg'
-  },
-  {
-    name: 'Ethan Wilson',
-    subject: 'Mathematics',
-    certifications: 'SAT Math Pro',
-    language: 'English',
-    availability: 'Evenings',
-    rating: 4.3,
-    price: 30,
-    location: 'Roswell, GA',
-    image: 'https://randomuser.me/api/portraits/men/77.jpg'
-  },
-  {
-    name: 'Isabella Moore',
-    subject: 'Science',
-    certifications: 'Biology Olympiad Finalist',
-    language: 'Spanish',
-    availability: 'Weekdays',
-    rating: 4.6,
-    price: 38,
-    location: 'Peachtree City, GA',
-    image: 'https://randomuser.me/api/portraits/women/36.jpg'
-  },
-  {
-    name: 'James Anderson',
-    subject: 'History',
-    certifications: 'US History Certified',
-    language: 'German',
-    availability: 'Weekends',
-    rating: 3.9,
-    price: 18,
-    location: 'Athens, GA',
-    image: 'https://randomuser.me/api/portraits/men/12.jpg'
-  },
-  {
-    name: 'Olivia Taylor',
-    subject: 'Reading & Writing',
-    certifications: 'Grammar Guru',
-    language: 'English',
-    availability: 'Evenings',
-    rating: 4.4,
-    price: 27,
-    location: 'Macon, GA',
-    image: 'https://randomuser.me/api/portraits/women/19.jpg'
-  }
-];
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
+import SearchBar from '../components/SearchBar/SearchBar';
 
 export default function Search() {
   const router = useRouter();
   const { q } = router.query;
 
+  const [tutorList, setTutorList] = useState([]);
   const [globalSearch, setGlobalSearch] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('All');
   const [selectedLanguage, setSelectedLanguage] = useState('All');
@@ -118,14 +19,26 @@ export default function Search() {
   const [sortOption, setSortOption] = useState('None');
 
   useEffect(() => {
+    const fetchTutors = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'tutors'));
+        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setTutorList(data);
+      } catch (error) {
+        console.error('Error fetching tutors:', error);
+      }
+    };
+
+    fetchTutors();
+  }, []);
+
+  useEffect(() => {
     if (q) {
       setGlobalSearch(q);
     }
   }, [q]);
 
-  const clearSearch = () => setGlobalSearch('');
-
-  const filteredTutors = tutors.filter((t) => {
+  const filteredTutors = tutorList.filter((t) => {
     const searchMatch = globalSearch.trim() === '' ||
       t.name.toLowerCase().includes(globalSearch.toLowerCase()) ||
       t.subject.toLowerCase().includes(globalSearch.toLowerCase()) ||
@@ -148,18 +61,7 @@ export default function Search() {
   return (
     <div className={styles.searchPage}>
       <div className={styles.globalSearchWrapper}>
-        <div className={styles.searchBarContainer}>
-          <input
-            type="text"
-            placeholder="Search by subject, name, language, or availability..."
-            value={globalSearch}
-            onChange={(e) => setGlobalSearch(e.target.value)}
-            className={styles.globalSearchInput}
-          />
-          {globalSearch && (
-            <button onClick={clearSearch} className={styles.clearBtn}>×</button>
-          )}
-        </div>
+        <SearchBar onSearch={(value) => setGlobalSearch(value)} />
       </div>
 
       <div className={styles.filterBar}>

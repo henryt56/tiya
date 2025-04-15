@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styles from './SearchBar.module.css';
 import { useRouter } from 'next/router';
 
-function SearchBar({ onSearch = () => {} }) { // 👈 DEFAULT PROP FIX
+function SearchBar({ onSearch = () => {} }) {
   const [subject, setSubject] = useState('');
   const router = useRouter();
 
@@ -37,9 +37,12 @@ function SearchBar({ onSearch = () => {} }) { // 👈 DEFAULT PROP FIX
       </svg>
       <input
         type="text"
-        placeholder="Search by subject"
+        placeholder="Search by subject, name, language, or availability..."
         value={subject}
-        onChange={(e) => setSubject(e.target.value)}
+        onChange={(e) => {
+          setSubject(e.target.value);
+          onSearch(e.target.value);
+        }}
         onKeyDown={handleKeyDown}
         data-testid="search-input"
         className={styles.searchInput}
