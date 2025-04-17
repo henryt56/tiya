@@ -3,7 +3,7 @@ import styles from '../styles/Search.module.css';
 import { useRouter } from 'next/router';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import SearchBar from '../components/SearchBar/SearchBar';
+import SearchBar from '../components/SearchBar';
 
 export default function Search() {
   const router = useRouter();
@@ -18,50 +18,142 @@ export default function Search() {
   const [selectedPrice, setSelectedPrice] = useState('All');
   const [sortOption, setSortOption] = useState('None');
 
+  const [zip, setZip] = useState('');
+  const [radius, setRadius] = useState(10);
+  const [zipCoords, setZipCoords] = useState(null);
+
   useEffect(() => {
     const fetchTutors = async () => {
       try {
         const snapshot = await getDocs(collection(db, 'tutors'));
         const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log('Fetched tutors:', data.map(t => t.name));
         setTutorList(data);
       } catch (error) {
         console.error('Error fetching tutors:', error);
       }
     };
-
     fetchTutors();
   }, []);
 
   useEffect(() => {
-    if (q) {
-      setGlobalSearch(q);
-    }
+    if (q) setGlobalSearch(q);
   }, [q]);
 
+  const handleZipKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+
+      if (!zip.trim()) return;
+
+      try {
+        const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=AIzaSyDH5lSWgeZDm_UmxMa6PQnEr6IT1xFMdqg`);
+        const data = await res.json();
+        const loc = data.results[0]?.geometry.location;
+        if (loc) {
+          setZipCoords({ lat: loc.lat, lng: loc.lng });
+          console.log('📍 ZIP coordinates updated:', loc);
+        } else {
+          console.warn('❌ No coordinates found for ZIP');
+        }
+      } catch (err) {
+        console.error('ZIP lookup failed:', err);
+      }
+    }
+  };
+
+  const calculateDistance = (lat1, lng1, lat2, lng2) => {
+    const toRad = deg => deg * (Math.PI / 180);
+    const R = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  const relevanceScore = (tutor, query) => {
+    const fields = [tutor.name, tutor.subject, tutor.language, tutor.availability, tutor.location];
+    return fields.reduce((score, field) =>
+      score + (field?.toLowerCase().includes(query.toLowerCase()) ? 1 : 0), 0
+    );
+  };
+
   const filteredTutors = tutorList.filter((t) => {
-    const searchMatch = globalSearch.trim() === '' ||
-      t.name.toLowerCase().includes(globalSearch.toLowerCase()) ||
-      t.subject.toLowerCase().includes(globalSearch.toLowerCase()) ||
-      t.language.toLowerCase().includes(globalSearch.toLowerCase()) ||
-      t.availability.toLowerCase().includes(globalSearch.toLowerCase());
+    const q = globalSearch.toLowerCase();
+    const matchesSearch =
+      !q ||
+      t.name.toLowerCase().includes(q) ||
+      t.subject.toLowerCase().includes(q) ||
+      t.language.toLowerCase().includes(q) ||
+      t.availability.toLowerCase().includes(q) ||
+      (t.location?.toLowerCase() || '').includes(q) ||
+      t.price?.toString().includes(q) ||
+      t.rating?.toString().includes(q);
 
-    const subjectMatch = selectedSubject === 'All' || t.subject === selectedSubject;
-    const languageMatch = selectedLanguage === 'All' || t.language === selectedLanguage;
-    const availabilityMatch = selectedAvailability === 'All' || t.availability === selectedAvailability;
-    const ratingMatch = selectedRating === 'All' || Math.floor(t.rating) >= parseInt(selectedRating);
-    const priceMatch =
-      selectedPrice === 'All' ||
-      (selectedPrice === '<20' && t.price < 20) ||
-      (selectedPrice === '20-40' && t.price >= 20 && t.price <= 40) ||
-      (selectedPrice === '>40' && t.price > 40);
+    const matchesZipRadius = zipCoords && t.coordinates
+      ? calculateDistance(zipCoords.lat, zipCoords.lng, t.coordinates.lat, t.coordinates.lng) <= radius
+      : true;
 
-    return searchMatch && subjectMatch && languageMatch && availabilityMatch && ratingMatch && priceMatch;
+    return (
+      matchesSearch &&
+      (selectedSubject === 'All' || t.subject === selectedSubject) &&
+      (selectedLanguage === 'All' || t.language === selectedLanguage) &&
+      (selectedAvailability === 'All' || t.availability === selectedAvailability) &&
+      (selectedRating === 'All' || Math.floor(t.rating) >= parseInt(selectedRating)) &&
+      (selectedPrice === 'All' ||
+        (selectedPrice === '<20' && t.price < 20) ||
+        (selectedPrice === '20-40' && t.price >= 20 && t.price <= 40) ||
+        (selectedPrice === '>40' && t.price > 40)) &&
+      matchesZipRadius
+    );
   });
+
+  const uniqueTutors = Array.from(
+    new Map(filteredTutors.map(t => [`${t.name}-${t.subject}`, t])).values()
+  );
+
+  const sortedTutors = [...uniqueTutors].sort((a, b) => {
+    if (sortOption === 'lowToHigh') return a.price - b.price;
+    if (sortOption === 'highToLow') return b.price - a.price;
+    if (sortOption === 'relevance') return relevanceScore(b, globalSearch) - relevanceScore(a, globalSearch);
+    return 0;
+  });
+
+  const getDistanceLabel = (tutor) => {
+    if (!zipCoords || !tutor.coordinates) return '';
+    const dist = calculateDistance(zipCoords.lat, zipCoords.lng, tutor.coordinates.lat, tutor.coordinates.lng);
+    return ` (${dist.toFixed(1)} mi away)`;
+  };
 
   return (
     <div className={styles.searchPage}>
       <div className={styles.globalSearchWrapper}>
-        <SearchBar onSearch={(value) => setGlobalSearch(value)} />
+        <div className={styles.searchSplitRow}>
+          <div className={styles.searchColumn}>
+            <SearchBar onSearch={(val) => setGlobalSearch(val)} />
+          </div>
+          <div className={styles.zipColumn}>
+            <input
+              type="text"
+              className={styles.zipInputStyled}
+              placeholder="ZIP"
+              value={zip}
+              onChange={(e) => setZip(e.target.value)}
+              onKeyDown={handleZipKeyDown}
+            />
+            <select
+              className={styles.radiusSelect}
+              value={radius}
+              onChange={(e) => setRadius(parseInt(e.target.value))}
+            >
+              <option value={5}>5 mi</option>
+              <option value={10}>10 mi</option>
+              <option value={15}>15 mi</option>
+              <option value={25}>25 mi</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className={styles.filterBar}>
@@ -97,14 +189,19 @@ export default function Search() {
           <option value="20-40">$20 - $40</option>
           <option value=">40">Over $40</option>
         </select>
+        <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} className={styles.filterPill}>
+          <option value="None">Sort By</option>
+          <option value="relevance">Relevance</option>
+          <option value="lowToHigh">Price: Low to High</option>
+          <option value="highToLow">Price: High to Low</option>
+        </select>
       </div>
 
       <h2 className={styles.resultsHeading}>Search Results</h2>
-
       <div className={styles.gridContainer}>
-        {filteredTutors.length > 0 ? (
-          filteredTutors.map((tutor, idx) => (
-            <section key={idx} className={styles.cardSmallBox}>
+        {sortedTutors.length > 0 ? (
+          sortedTutors.map((tutor, index) => (
+            <section key={tutor.id || `${tutor.name}-${tutor.subject}-${index}`} className={styles.cardSmallBox}>
               <img src={tutor.image} alt={tutor.name} className={styles.cardImageSmall} />
               <div className={styles.cardContentSmall}>
                 <h2>{tutor.name}</h2>
@@ -112,6 +209,7 @@ export default function Search() {
                 <p className={styles.detail}>{tutor.language}</p>
                 <p className={styles.detail}>{tutor.certifications}</p>
                 <p className={styles.detail}>⭐ {tutor.rating} — {tutor.availability}</p>
+                <p className={styles.detail}>📍 {tutor.location}{getDistanceLabel(tutor)}</p>
                 <p className={styles.detail}>💵 ${tutor.price}</p>
               </div>
             </section>

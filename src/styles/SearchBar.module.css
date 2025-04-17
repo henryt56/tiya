@@ -1,7 +1,7 @@
 .searchContainer {
   position: relative;
-  width: 100%;
-  max-width: 380px;
+  max-width: 500px; /* was 500px */
+  width: 100%;       /* makes it responsive */  
   margin: 0 auto;
 }
 
@@ -36,7 +36,6 @@
   pointer-events: none;
 }
 
-/* Button remains invisible for layout/testing reasons */
 .searchButton {
   position: absolute;
   right: 0;
@@ -46,4 +45,3 @@
   width: 40px;
   cursor: pointer;
 }
-

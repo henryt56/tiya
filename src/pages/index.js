@@ -1,7 +1,7 @@
 import styles from '../styles/HomePage.module.css';
 import Image from 'next/image';
 import image from '../../public/images/student-studying.png';
-import SearchBar from '../components/SearchBar/SearchBar';
+import SearchBar from '../components/SearchBar';
 import { useRouter } from 'next/router';
 
 function HomePage() {
@@ -70,7 +70,7 @@ function HomePage() {
           <button className={styles.stepsBtn}>1. Create an Account</button>
           <button className={styles.stepsBtn}>2. Find your tutor</button>
           <button className={styles.stepsBtn}>3. Start learning</button>
-          <SearchBar />
+          <SearchBar showZip={false} />
         </section>
       </div>
     </div>
