@@ -16,7 +16,7 @@ export default function Search() {
   const [selectedAvailability, setSelectedAvailability] = useState('All');
   const [selectedRating, setSelectedRating] = useState('All');
   const [selectedPrice, setSelectedPrice] = useState('All');
-  const [sortOption, setSortOption] = useState('None');
+  const [sortOption, setSortOption] = useState('distance');
 
   const [zip, setZip] = useState('');
   const [radius, setRadius] = useState(10);
@@ -27,7 +27,6 @@ export default function Search() {
       try {
         const snapshot = await getDocs(collection(db, 'tutors'));
         const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log('Fetched tutors:', data.map(t => t.name));
         setTutorList(data);
       } catch (error) {
         console.error('Error fetching tutors:', error);
@@ -40,34 +39,41 @@ export default function Search() {
     if (q) setGlobalSearch(q);
   }, [q]);
 
-  const handleZipKeyDown = async (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+  // 💡 New: Fetch ZIP coords anytime ZIP changes
+  useEffect(() => {
+    if (!zip) return;
 
-      if (!zip.trim()) return;
-
+    const fetchCoords = async () => {
       try {
-        const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=AIzaSyDH5lSWgeZDm_UmxMa6PQnEr6IT1xFMdqg`);
+        const res = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=AIzaSyDH5lSWgeZDm_UmxMa6PQnEr6IT1xFMdqg`
+        );
         const data = await res.json();
         const loc = data.results[0]?.geometry.location;
         if (loc) {
+          console.log('✅ ZIP coords updated:', loc);
           setZipCoords({ lat: loc.lat, lng: loc.lng });
-          console.log('📍 ZIP coordinates updated:', loc);
         } else {
-          console.warn('❌ No coordinates found for ZIP');
+          console.warn('⚠️ No location found for ZIP');
+          setZipCoords(null);
         }
       } catch (err) {
-        console.error('ZIP lookup failed:', err);
+        console.error('❌ ZIP lookup failed:', err);
       }
-    }
-  };
+    };
+
+    fetchCoords();
+  }, [zip]);
 
   const calculateDistance = (lat1, lng1, lat2, lng2) => {
     const toRad = deg => deg * (Math.PI / 180);
     const R = 6371;
     const dLat = toRad(lat2 - lat1);
     const dLng = toRad(lng2 - lng1);
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
@@ -109,6 +115,8 @@ export default function Search() {
     );
   });
 
+  console.log('Filtered tutors count:', filteredTutors.length);
+
   const uniqueTutors = Array.from(
     new Map(filteredTutors.map(t => [`${t.name}-${t.subject}`, t])).values()
   );
@@ -117,6 +125,11 @@ export default function Search() {
     if (sortOption === 'lowToHigh') return a.price - b.price;
     if (sortOption === 'highToLow') return b.price - a.price;
     if (sortOption === 'relevance') return relevanceScore(b, globalSearch) - relevanceScore(a, globalSearch);
+    if (sortOption === 'distance' && zipCoords && a.coordinates && b.coordinates) {
+      const distA = calculateDistance(zipCoords.lat, zipCoords.lng, a.coordinates.lat, a.coordinates.lng);
+      const distB = calculateDistance(zipCoords.lat, zipCoords.lng, b.coordinates.lat, b.coordinates.lng);
+      return distA - distB;
+    }
     return 0;
   });
 
@@ -140,7 +153,6 @@ export default function Search() {
               placeholder="ZIP"
               value={zip}
               onChange={(e) => setZip(e.target.value)}
-              onKeyDown={handleZipKeyDown}
             />
             <select
               className={styles.radiusSelect}
@@ -190,7 +202,7 @@ export default function Search() {
           <option value=">40">Over $40</option>
         </select>
         <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} className={styles.filterPill}>
-          <option value="None">Sort By</option>
+          <option value="distance">Distance</option>
           <option value="relevance">Relevance</option>
           <option value="lowToHigh">Price: Low to High</option>
           <option value="highToLow">Price: High to Low</option>
@@ -201,7 +213,7 @@ export default function Search() {
       <div className={styles.gridContainer}>
         {sortedTutors.length > 0 ? (
           sortedTutors.map((tutor, index) => (
-            <section key={tutor.id || `${tutor.name}-${tutor.subject}-${index}`} className={styles.cardSmallBox}>
+            <section key={tutor.id || `${tutor.name}-${index}`} className={styles.cardSmallBox}>
               <img src={tutor.image} alt={tutor.name} className={styles.cardImageSmall} />
               <div className={styles.cardContentSmall}>
                 <h2>{tutor.name}</h2>
