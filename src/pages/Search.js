@@ -39,7 +39,6 @@ export default function Search() {
     if (q) setGlobalSearch(q);
   }, [q]);
 
-  // 💡 New: Fetch ZIP coords anytime ZIP changes
   useEffect(() => {
     if (!zip) return;
 
@@ -213,7 +212,13 @@ export default function Search() {
       <div className={styles.gridContainer}>
         {sortedTutors.length > 0 ? (
           sortedTutors.map((tutor, index) => (
-            <section key={tutor.id || `${tutor.name}-${index}`} className={styles.cardSmallBox}>
+            <section
+              key={tutor.id || `${tutor.name}-${index}`}
+              className={styles.cardSmallBox}
+               //  Feel free to integrate the tutor profile here. Replace this with routing to a unique tutor id or tutor profile component
+              onClick={() => router.push(`/TutorProfile?id=${tutor.id}`)}
+              style={{ cursor: 'pointer' }}
+            >
               <img src={tutor.image} alt={tutor.name} className={styles.cardImageSmall} />
               <div className={styles.cardContentSmall}>
                 <h2>{tutor.name}</h2>
