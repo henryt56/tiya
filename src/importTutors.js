@@ -27,7 +27,7 @@ initializeApp({
 
 const db = getFirestore();
 
-// 🔍 Geocode a location into lat/lng
+//  Geocode a location into lat/lng
 async function fetchCoordinates(location) {
   try {
     const res = await axios.get(
@@ -43,19 +43,18 @@ async function fetchCoordinates(location) {
     const result = res.data.results[0];
     if (result) {
       const coords = result.geometry.location;
-      console.log(`✅ Found coordinates for ${location}:`, coords);
+      console.log(` Found coordinates for ${location}:`, coords);
       return coords; // { lat, lng }
     } else {
-      console.warn(`⚠️ No results found for location: ${location}`);
+      console.warn(` No results found for location: ${location}`);
     }
   } catch (err) {
-    console.error(`❌ Error fetching coordinates for ${location}:`, err.message);
+    console.error(` Error fetching coordinates for ${location}:`, err.message);
   }
 
   return null;
 }
 
-// 🌟 Main import function
 async function importTutors() {
   const batch = db.batch();
 
@@ -74,9 +73,9 @@ async function importTutors() {
 
   try {
     await batch.commit();
-    console.log('🎉 Tutors imported with coordinates!');
+    console.log(' Tutors imported with coordinates!');
   } catch (error) {
-    console.error('❌ Failed to commit tutor batch:', error);
+    console.error(' Failed to commit tutor batch:', error);
   }
 }
 
