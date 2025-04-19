@@ -5,6 +5,8 @@ import {
   markAsRead,
   listenToConversation,
 } from '../services/Messages/messageService';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import * as AuthContext from '../services/context/AuthContext';
 
 jest.mock('../firebaseConfig', () => ({
   db: {
@@ -16,8 +18,8 @@ jest.mock('../firebaseConfig', () => ({
 }));
 
 jest.mock('firebase/firestore', () => ({
-  collection: jest.fn(),
-  addDoc: jest.fn(),
+  collection: jest.fn(() => 'messages-collection'),
+  addDoc: jest.fn(() => Promise.resolve({ id: 'mock-message-id' })),
   query: jest.fn(),
   where: jest.fn(),
   orderBy: jest.fn(),
@@ -28,25 +30,57 @@ jest.mock('firebase/firestore', () => ({
   doc: jest.fn(),
 }));
 
+// Mock AuthContext
+jest.mock('../services/context/AuthContext', () => ({
+  getUserData: jest.fn()
+}));
+
 describe('Message Service', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('sendMessage should create a message and return ID', async () => {
-    const addDoc = require('firebase/firestore').addDoc;
-    addDoc.mockResolvedValueOnce({ id: 'msg123' });
+  it('sendMessage should create a message and return ID', async () => {
+    // Set up mock user data
+    AuthContext.getUserData.mockImplementation((uid) => {
+      if (uid === 'sender123') {
+        return Promise.resolve({
+          uid: 'sender123',
+          role: 'student',
+          displayName: 'Test Sender'
+        });
+      } else if (uid === 'receiver456') {
+        return Promise.resolve({
+          uid: 'receiver456',
+          role: 'tutor',
+          displayName: 'Test Receiver'
+        });
+      }
+      return Promise.resolve(null);
+    });
 
-    const result = await sendMessage(
-      'user1',
-      'User One',
-      'user2',
-      'User Two',
-      'Hello!',
+    // Call the function with the correct parameters based on the implementation
+    const messageId = await sendMessage(
+      'sender123',              // senderId
+      'Test Sender',            // senderName
+      'receiver456',            // receiverId
+      'Test Receiver',          // receiverName
+      'Test message content'    // content
     );
 
-    expect(addDoc).toHaveBeenCalled();
-    expect(result).toBe('msg123');
+    // Assertions
+    expect(AuthContext.getUserData).toHaveBeenCalledWith('sender123');
+    expect(AuthContext.getUserData).toHaveBeenCalledWith('receiver456');
+    expect(addDoc).toHaveBeenCalledTimes(1);
+    expect(addDoc).toHaveBeenCalledWith('messages-collection', expect.objectContaining({
+      senderId: 'sender123',
+      senderName: 'Test Sender',
+      receiverId: 'receiver456',
+      receiverName: 'Test Receiver',
+      messageContent: 'Test message content',
+      isRead: false
+    }));
+    expect(messageId).toBe('mock-message-id');
   });
 
   test('getUserMessageHistory should return conversations', async () => {
