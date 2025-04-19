@@ -91,14 +91,19 @@ const Login = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-      <div className="login-container bg-white p-4 rounded shadow" style={{ maxWidth: '400px', width: '100%' }}>
+      <div
+        className="login-container bg-white p-4 rounded shadow"
+        style={{ maxWidth: '400px', width: '100%' }}
+      >
         <h2 className="text-center mb-4">Log in to Your Tiya Account</h2>
-        
+
         {error && <div className="alert alert-danger">{error}</div>}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">Email</label>
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
             <input
               type="email"
               className="form-control"
@@ -108,9 +113,11 @@ const Login = () => {
               required
             />
           </div>
-          
+
           <div className="mb-3">
-            <label htmlFor="password" className="form-label">Password</label>
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
             <input
               type="password"
               className="form-control"
@@ -120,27 +127,42 @@ const Login = () => {
               required
             />
           </div>
-          
+
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div>
-              <Link href="/forgot-password" className="text-decoration-none" style={{ color: '#67c2ff' }}>
+              <Link
+                href="/Forgot-password"
+                className="text-decoration-none"
+                style={{ color: '#67c2ff' }}
+              >
                 Forgot password?
               </Link>
             </div>
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="btn w-100 py-2"
-            style={{ backgroundColor: '#67c2ff', borderColor: '#67c2ff', color: 'white' }}
+            style={{
+              backgroundColor: '#67c2ff',
+              borderColor: '#67c2ff',
+              color: 'white',
+            }}
             disabled={loading}
           >
             {loading ? 'Logging in...' : 'Log in'}
           </button>
         </form>
-        
+
         <div className="text-center mt-3">
-          Don&apos;t have an account? <Link href="/register" className="text-decoration-none" style={{ color: '#67c2ff' }}>Sign up</Link>
+          Don&apos;t have an account?{' '}
+          <Link
+            href="/Register"
+            className="text-decoration-none"
+            style={{ color: '#67c2ff' }}
+          >
+            Sign up
+          </Link>
         </div>
       </div>
     </div>

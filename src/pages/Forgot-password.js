@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import Link from 'next/link';
 import { auth } from '../firebaseConfig';
+import styles from '../styles/Forgot-password.module.css';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -26,14 +27,14 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="forgot-password-container">
-      <h2>Reset Your Password</h2>
+    <div className={styles.container}>
+      <h2 className={styles.header}>Reset Password</h2>
 
-      {error && <div className="error-message">{error}</div>}
-      {message && <div className="success-message">{message}</div>}
+      {error && <div className={styles.errorMessage}>{error}</div>}
+      {message && <div className={styles.successMessage}>{message}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
+      <form onSubmit={handleSubmit} className={styles.formGroup}>
+        <div className={styles.formInput}>
           <label>Email</label>
           <input
             type="email"
@@ -43,13 +44,15 @@ const ForgotPassword = () => {
           />
         </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Sending...' : 'Send Reset Email'}
+        <button type="submit" disabled={loading} className={styles.resetButton}>
+          {loading ? 'Sending...' : 'Reset Password'}
         </button>
       </form>
 
-      <div className="login-link">
-        <Link href="/Login">Back to Login</Link>
+      <div className={styles.loginLink}>
+        <Link href="/Login" className={styles.link}>
+          Back to Login
+        </Link>
       </div>
     </div>
   );

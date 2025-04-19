@@ -80,149 +80,149 @@ const Register = () => {
 		}
 	};
 
-	return (
-		<div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-			<div
-				className="bg-white p-4 rounded shadow"
-				style={{ maxWidth: '500px', width: '100%' }}
-			>
-				<h2 className="text-center mb-4">Create Your Tiya Account</h2>
+  return (
+    <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+      <div
+        className="bg-white p-4 rounded shadow"
+        style={{ maxWidth: '500px', width: '100%' }}
+      >
+        <h2 className="text-center mb-4">Create Your Tiya Account</h2>
 
-				{error && <div className="alert alert-danger">{error}</div>}
+        {error && <div className="alert alert-danger">{error}</div>}
 
-				<form onSubmit={handleSubmit}>
-					<div className="mb-3">
-						<label className="form-label">I am a:</label>
-						<div className="d-flex gap-4">
-							<div className="form-check">
-								<input
-									className="form-check-input"
-									type="radio"
-									name="role"
-									id="roleStudent"
-									value="student"
-									checked={role === 'student'}
-									onChange={(e) => setRole(e.target.value)}
-								/>
-								<label className="form-check-label" htmlFor="roleStudent">
-									Student
-								</label>
-							</div>
-							<div className="form-check">
-								<input
-									className="form-check-input"
-									type="radio"
-									name="role"
-									id="roleTutor"
-									value="tutor"
-									checked={role === 'tutor'}
-									onChange={(e) => setRole(e.target.value)}
-								/>
-								<label className="form-check-label" htmlFor="roleTutor">
-									Tutor
-								</label>
-							</div>
-						</div>
-					</div>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label">I am a:</label>
+            <div className="d-flex gap-4">
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="role"
+                  id="roleStudent"
+                  value="student"
+                  checked={role === 'student'}
+                  onChange={(e) => setRole(e.target.value)}
+                />
+                <label className="form-check-label" htmlFor="roleStudent">
+                  Student
+                </label>
+              </div>
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="role"
+                  id="roleTutor"
+                  value="tutor"
+                  checked={role === 'tutor'}
+                  onChange={(e) => setRole(e.target.value)}
+                />
+                <label className="form-check-label" htmlFor="roleTutor">
+                  Tutor
+                </label>
+              </div>
+            </div>
+          </div>
 
-					<div className="row mb-3">
-						<div className="col-md-6 mb-3 mb-md-0">
-							<label htmlFor="firstName" className="form-label">
-								First Name
-							</label>
-							<input
-								type="text"
-								className="form-control"
-								id="firstName"
-								value={firstName}
-								onChange={(e) => setFirstName(e.target.value)}
-								required
-							/>
-						</div>
-						<div className="col-md-6">
-							<label htmlFor="lastName" className="form-label">
-								Last Name
-							</label>
-							<input
-								type="text"
-								className="form-control"
-								id="lastName"
-								value={lastName}
-								onChange={(e) => setLastName(e.target.value)}
-								required
-							/>
-						</div>
-					</div>
+          <div className="row mb-3">
+            <div className="col-md-6 mb-3 mb-md-0">
+              <label htmlFor="firstName" className="form-label">
+                First Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="col-md-6">
+              <label htmlFor="lastName" className="form-label">
+                Last Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+              />
+            </div>
+          </div>
 
-					<div className="mb-3">
-						<label htmlFor="email" className="form-label">
-							Email
-						</label>
-						<input
-							type="email"
-							className="form-control"
-							id="email"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							required
-						/>
-					</div>
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
+            <input
+              type="email"
+              className="form-control"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-					<div className="mb-3">
-						<label htmlFor="password" className="form-label">
-							Password
-						</label>
-						<input
-							type="password"
-							className="form-control"
-							id="password"
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							required
-						/>
-					</div>
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-					<div className="mb-4">
-						<label htmlFor="confirmPassword" className="form-label">
-							Confirm Password
-						</label>
-						<input
-							type="password"
-							className="form-control"
-							id="confirmPassword"
-							value={confirmPassword}
-							onChange={(e) => setConfirmPassword(e.target.value)}
-							required
-						/>
-					</div>
+          <div className="mb-4">
+            <label htmlFor="confirmPassword" className="form-label">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
 
-					<button
-						type="submit"
-						className="btn w-100 py-2 mb-3"
-						style={{
-							backgroundColor: '#67c2ff',
-							borderColor: '#67c2ff',
-							color: 'white',
-						}}
-						disabled={loading}
-					>
-						{loading ? 'Creating Account...' : 'Create Account'}
-					</button>
-				</form>
+          <button
+            type="submit"
+            className="btn w-100 py-2 mb-3"
+            style={{
+              backgroundColor: '#67c2ff',
+              borderColor: '#67c2ff',
+              color: 'white',
+            }}
+            disabled={loading}
+          >
+            {loading ? 'Creating Account...' : 'Create Account'}
+          </button>
+        </form>
 
-				<div className="text-center">
-					Already have an account?{' '}
-					<Link
-						href="/login"
-						className="text-decoration-none"
-						style={{ color: '#67c2ff' }}
-					>
-						Log in
-					</Link>
-				</div>
-			</div>
-		</div>
-	);
+        <div className="text-center">
+          Already have an account?{' '}
+          <Link
+            href="/login"
+            className="text-decoration-none"
+            style={{ color: '#67c2ff' }}
+          >
+            Log in
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Register;
