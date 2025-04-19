@@ -6,77 +6,79 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebaseConfig';
 
 const Register = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('student'); // Default role
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [confirmPassword, setConfirmPassword] = useState('');
+	const [role, setRole] = useState('student'); // Default role
+	const [firstName, setFirstName] = useState('');
+	const [lastName, setLastName] = useState('');
+	const [error, setError] = useState('');
+	const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
+	const router = useRouter();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 
-    // Form validation
-    if (password !== confirmPassword) {
-      return setError("Passwords don't match");
-    }
+		// Form validation
+		if (password !== confirmPassword) {
+			return setError("Passwords don't match");
+		}
 
-    if (password.length < 6) {
-      return setError('Password should be at least 6 characters');
-    }
+		if (password.length < 6) {
+			return setError('Password should be at least 6 characters');
+		}
 
-    try {
-      setError('');
-      setLoading(true);
+		try {
+			setError('');
+			setLoading(true);
 
-      // Create the user with Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      const user = userCredential.user;
+			// Create the user with Firebase Authentication
+			const userCredential = await createUserWithEmailAndPassword(
+				auth,
+				email,
+				password,
+			);
+			const user = userCredential.user;
 
-      console.log('User created in Authentication:', user.uid);
+			console.log('User created in Authentication:', user.uid);
 
-      try {
-        // Create user document in Firestore
-        await setDoc(doc(db, 'users', user.uid), {
-          uid: user.uid,
-          email: user.email,
-          firstName,
-          lastName,
-          displayName: `${firstName} ${lastName}`,
-          role,
-          createdAt: new Date().toISOString(),
-        });
+			try {
+				// Create user document in Firestore
+				await setDoc(doc(db, 'users', user.uid), {
+					uid: user.uid,
+					email: user.email,
+					firstName,
+					lastName,
+					displayName: `${firstName} ${lastName}`,
+					role,
+					profileComplete: false, // Add this flag to track profile completion
+					createdAt: new Date().toISOString(),
+				});
 
-        console.log('User document created in Firestore');
+				console.log('User document created in Firestore');
 
-        // Redirect based on role
-        if (role === 'student') {
-          router.push('/StudentDashboard');
-        } else if (role === 'tutor') {
-          router.push('/TutorDashboard');
-        }
-      } catch (firestoreError) {
-        console.error('Firestore error:', firestoreError);
-        setError(
-          `Account created but profile setup failed: ${firestoreError.message}. Please contact support.`,
-        );
-        // You might want to delete the auth user here since the Firestore doc wasn't created
-      }
-    } catch (authError) {
-      console.error('Authentication error:', authError);
-      setError('Failed to create an account: ' + authError.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+				// Redirect based on role
+				if (role === 'student') {
+					router.push('/StudentDashboard');
+				} else if (role === 'tutor') {
+					// Redirect tutors to profile setup page
+					router.push('/TutorProfile');
+				}
+			} catch (firestoreError) {
+				console.error('Firestore error:', firestoreError);
+				setError(
+					`Account created but profile setup failed: ${firestoreError.message}. Please contact support.`,
+				);
+				// You might want to delete the auth user here since the Firestore doc wasn't created
+			}
+		} catch (authError) {
+			console.error('Authentication error:', authError);
+			setError('Failed to create an account: ' + authError.message);
+		} finally {
+			setLoading(false);
+		}
+	};
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
