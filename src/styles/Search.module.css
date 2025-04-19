@@ -1,0 +1,135 @@
+/* Final Search.module.css with styled ZIP + distance dropdown inside same pill */
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+  justify-items: center;
+}
+
+.cardSmallBox {
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  padding: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.cardSmallBox:hover {
+  transform: translateY(-5px);
+}
+
+.cardImageSmall {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 1rem;
+}
+
+.cardContentSmall {
+  padding-top: 1rem;
+}
+
+.detail {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+}
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 1.5rem;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.filterPill {
+  padding: 10px 16px;
+  border-radius: 30px;
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterPill:hover {
+  background-color: #ffffff;
+  border-color: #aaa;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.globalSearchWrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 2rem auto 1rem;
+}
+
+.searchSplitRow {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+}
+
+.searchColumn {
+  flex-grow: 1;
+  max-width: 600px;
+  min-width: 300px;
+}
+
+.zipColumn {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  background-color: #fff;
+  height: 44px;
+  gap: 8px;
+  margin-left: -50px;
+}
+
+.zipInputStyled {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  outline: none;
+  width: 80px;
+}
+
+.radiusSelect {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  cursor: pointer;
+}
+
+.resultsHeading {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.noResults {
+  text-align: center;
+  font-size: 1.1rem;
+  padding: 2rem;
+  color: #777;
+}

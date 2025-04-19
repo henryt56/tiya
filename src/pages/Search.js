@@ -1,7 +1,8 @@
+// Updated Search.js component
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/Search.module.css';
 import { useRouter } from 'next/router';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import SearchBar from '../components/SearchBar';
 import Link from 'next/link';
@@ -10,6 +11,7 @@ export default function Search() {
   const router = useRouter();
   const { q } = router.query;
 
+  // Combined tutor list from both sources
   const [tutorList, setTutorList] = useState([]);
   const [globalSearch, setGlobalSearch] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('All');
@@ -24,16 +26,57 @@ export default function Search() {
   const [zipCoords, setZipCoords] = useState(null);
 
   useEffect(() => {
-    const fetchTutors = async () => {
+    const fetchAllTutors = async () => {
       try {
-        const snapshot = await getDocs(collection(db, 'tutors'));
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setTutorList(data);
+        // Fetch from tutors collection
+        const tutorsSnapshot = await getDocs(collection(db, 'tutors'));
+        const tutorsData = tutorsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Fetch from users collection (tutors only)
+        const usersTutorsQuery = query(
+          collection(db, 'users'), 
+          where('role', '==', 'tutor'),
+          where('profileComplete', '==', true)
+        );
+        const usersTutorsSnapshot = await getDocs(usersTutorsQuery);
+        
+        // Map user tutors to the same format as the tutors collection
+        const usersTutorsData = usersTutorsSnapshot.docs.map(doc => {
+          const userData = doc.data();
+          // Check if this user is already in tutors collection
+          const existsInTutors = tutorsData.some(t => t.id === doc.id);
+          
+          // If already exists, skip
+          if (existsInTutors) return null;
+          
+          // Create a compatible tutor object from user data
+          return {
+            id: doc.id,
+            name: userData.displayName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+            subject: userData.subjects ? userData.subjects[0] || "" : "",
+            language: userData.languages ? userData.languages[0] || "" : "",
+            availability: userData.availability ? Object.keys(userData.availability)
+              .filter(day => userData.availability[day].available)
+              .join(", ") : "",
+            location: userData.location || "",
+            price: Number(userData.hourlyRate) || 0,
+            rating: userData.rating || 0,
+            image: userData.profilePhoto || "",
+            certifications: userData.certifications ? 
+              userData.certifications.map(cert => cert.name).join(", ") : "",
+            coordinates: userData.coordinates || null
+          };
+        }).filter(Boolean); // Remove null entries
+        
+        // Combine both lists
+        const combinedTutors = [...tutorsData, ...usersTutorsData];
+        setTutorList(combinedTutors);
       } catch (error) {
         console.error('Error fetching tutors:', error);
       }
     };
-    fetchTutors();
+    
+    fetchAllTutors();
   }, []);
 
   useEffect(() => {
@@ -46,7 +89,7 @@ export default function Search() {
     const fetchCoords = async () => {
       try {
         const res = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=AIzaSyDH5lSWgeZDm_UmxMa6PQnEr6IT1xFMdqg`
         );
         const data = await res.json();
         const loc = data.results[0]?.geometry.location;
@@ -229,9 +272,6 @@ export default function Search() {
                 <p className={styles.detail}>⭐ {tutor.rating} — {tutor.availability}</p>
                 <p className={styles.detail}>📍 {tutor.location}{getDistanceLabel(tutor)}</p>
                 <p className={styles.detail}>💵 ${tutor.price}</p>
-                <Link href={`/TutorPublicProfile?id=${tutor.id}`} className="btn btn-sm btn-primary mt-2">
-                  View Profile
-                </Link>
               </div>
             </section>
           ))
