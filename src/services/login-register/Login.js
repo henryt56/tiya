@@ -40,6 +40,13 @@ const Login = () => {
 
         console.log('User document found with role:', role);
 
+        // Check if tutor profile is complete
+        if (role === 'tutor' && userData.profileComplete === false) {
+          // Tutor with incomplete profile - redirect to profile setup
+          router.push('/TutorProfile');
+          return;
+        }
+
         // Redirect based on role
         if (role === 'student') {
           router.push('/StudentDashboard');
@@ -63,6 +70,7 @@ const Login = () => {
             email: user.email,
             role: 'student', // Default role
             displayName: user.displayName || email.split('@')[0],
+            profileComplete: false,
             createdAt: new Date().toISOString(),
           });
 
