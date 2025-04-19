@@ -5,21 +5,16 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import axios from 'axios';
 
-// Handle ES module path resolution
+// Resolve __dirname in ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load credentials and tutor data
+// Load Firebase credentials
 const serviceAccount = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../serviceAccountKey.json'), 'utf-8')
 );
-const tutorsRaw = JSON.parse(
-  fs.readFileSync(path.join(__dirname, './tutors.json'), 'utf-8')
-);
 
-const tutors = Object.values(tutorsRaw);
-
-const GOOGLE_MAPS_API_KEY = 'AIzaSyCiSXCcoY4t8TQtIPVOFx0fQwlWgsTqUM4';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyDH5lSWgeZDm_UmxMa6PQnEr6IT1xFMdqg';
 
 initializeApp({
   credential: cert(serviceAccount),
@@ -27,10 +22,9 @@ initializeApp({
 
 const db = getFirestore();
 
-//  Geocode a location into lat/lng
 async function fetchCoordinates(location) {
   try {
-    const res = await axios.get(
+    const response = await axios.get(
       'https://maps.googleapis.com/maps/api/geocode/json',
       {
         params: {
@@ -40,43 +34,36 @@ async function fetchCoordinates(location) {
       }
     );
 
-    const result = res.data.results[0];
-    if (result) {
-      const coords = result.geometry.location;
-      console.log(` Found coordinates for ${location}:`, coords);
-      return coords; // { lat, lng }
-    } else {
-      console.warn(` No results found for location: ${location}`);
-    }
+    const result = response.data.results[0];
+    return result?.geometry?.location || null;
   } catch (err) {
     console.error(` Error fetching coordinates for ${location}:`, err.message);
-  }
-
-  return null;
-}
-
-async function importTutors() {
-  const batch = db.batch();
-
-  for (const tutor of tutors) {
-    const docRef = db.collection('tutors').doc(); // auto-generated ID
-
-    const coords = await fetchCoordinates(tutor.location);
-
-    const tutorWithCoords = {
-      ...tutor,
-      coordinates: coords || null,
-    };
-
-    batch.set(docRef, tutorWithCoords);
-  }
-
-  try {
-    await batch.commit();
-    console.log(' Tutors imported with coordinates!');
-  } catch (error) {
-    console.error(' Failed to commit tutor batch:', error);
+    return null;
   }
 }
 
-importTutors();
+async function updateMissingCoordinates() {
+  const snapshot = await db.collection('tutors').get();
+  let updated = 0;
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+
+    if (!data.coordinates || data.coordinates === null) {
+      const coords = await fetchCoordinates(data.location);
+      if (coords) {
+        await db.collection('tutors').doc(doc.id).update({
+          coordinates: coords,
+        });
+        console.log(` Updated ${data.name} with coordinates:`, coords);
+        updated++;
+      } else {
+        console.warn(` Skipped ${data.name} — couldn't fetch coordinates`);
+      }
+    }
+  }
+
+  console.log(`Finished updating ${updated} tutors with coordinates!`);
+}
+
+updateMissingCoordinates();
