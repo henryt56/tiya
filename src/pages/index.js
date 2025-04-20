@@ -1,6 +1,5 @@
 import styles from '../styles/HomePage.module.css';
 import Image from 'next/image';
-import image from '../../public/images/student-studying.png';
 import SearchBar from '../components/SearchBar';
 import { useRouter } from 'next/router';
 
@@ -54,9 +53,9 @@ function HomePage() {
       <div className={styles.bottomsection}>
         <section>
           <Image
-            src={image}
+            src="../../public/images/student-studying.png"
             className={styles.image}
-            alt="An image of a student stying"
+            alt="An image of a student studying"
             width={300}
             height={300}
           />
