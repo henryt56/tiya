@@ -1,72 +1,67 @@
 import { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import {
-  EmbeddedCheckoutProvider,
-  EmbeddedCheckout,
+	EmbeddedCheckoutProvider,
+	EmbeddedCheckout,
 } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/router';
 import styles from '../styles/CheckoutPage.module.css';
 
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+	process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
 );
 
 function CheckoutPage() {
-  const [clientSecret, setClientSecret] = useState(null);
-  const router = useRouter();
+	const [clientSecret, setClientSecret] = useState(null);
+	const [tutorInfo, setTutorInfo] = useState({
+		uid: '',
+		displayName: '',
+	});
 
-  useEffect(() => {
-    const secret = localStorage.getItem('checkoutClientSecret');
-    const tutorUid = localStorage.getItem('checkoutTutorUid');
-    // On a project we'd deploy, we should probably make it clear this data from
-    // local storage afterwards, but this is just for a class project, so I'm
-    // thinking I'll just leave it as is
+	const router = useRouter();
 
-    if (!secret) {
-      if (tutorUid) {
-        router.push(`/tutors/${tutorUid}`); // Assuming this is the structure for our tutor profile routing; may need to modify if not
-      } else {
-        router.push(`/tutors`);
-      }
-      return;
-    }
-    setClientSecret(secret);
-    return () => {
-      localStorage.removeItem('checkoutClientSecret');
-    };
-  }, [router]);
+	useEffect(() => {
+		const secret = localStorage.getItem('checkoutClientSecret');
+		const tutorUid = localStorage.getItem('checkoutTutorUid');
+		const tutorName = localStorage.getItem('tutorDisplayName');
 
-  const handleCancel = () => {
-    const tutorUid = localStorage.getItem('checkoutTutorUid');
-    if (tutorUid) {
-      router.push(`/tutors/${tutorUid}`);
-    } else {
-      router.push(`/tutors`);
-    }
-  };
+		if (!secret) {
+			if (tutorUid) {
+				router.push(`/TutorPublicProfile?id=${tutorUid}`); // Assuming this is the structure for our tutor profile routing; may need to modify if not
+			} else {
+				router.push(`/Search`);
+			}
+			return;
+		}
+		setClientSecret(secret);
+		setTutorInfo({
+			uid: tutorUid,
+			displayName: tutorName,
+		});
 
-  if (!clientSecret) {
-    return <div>Loading...</div>;
-  }
+		return () => {
+			localStorage.removeItem('checkoutClientSecret');
+		};
+	}, [router]);
 
-  return (
-    <div className={styles.checkoutContainer}>
-      <h1>Complete Your Booking</h1>
+	if (!clientSecret) {
+		return <div>Loading...</div>;
+	}
 
-      <div className={styles.checkout}>
-        <EmbeddedCheckoutProvider
-          stripe={stripePromise}
-          options={{ clientSecret }}
-        >
-          <EmbeddedCheckout />
-        </EmbeddedCheckoutProvider>
-      </div>
+	return (
+		<div className={styles.checkoutContainer}>
+			<h1>Complete Your Booking</h1>
 
-      <button onClick={handleCancel} className={styles.cancelButton}>
-        Cancel
-      </button>
-    </div>
-  );
+			<div className={styles.checkout}>
+				<EmbeddedCheckoutProvider
+					stripe={stripePromise}
+					options={{ clientSecret }}
+				>
+					<EmbeddedCheckout />
+				</EmbeddedCheckoutProvider>
+			</div>
+		</div>
+	);
 }
 
 export default CheckoutPage;

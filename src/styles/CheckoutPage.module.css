@@ -1,11 +1,11 @@
-.checkoutContainer {
-}
-
 .checkoutContainer h1 {
+	text-align: center;
 }
 
-.checkout {
+.checkoutContainer p {
+	text-align: center;
 }
 
-.cancelButton {
+.checkoutContainer {
+	margin-bottom: 4em;
 }
