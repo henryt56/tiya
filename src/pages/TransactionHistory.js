@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import styles from '../styles/TransactionHistory.module.css';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { TextField } from '@mui/material';
 import dayjs from 'dayjs';
 
@@ -31,7 +29,7 @@ export default function TransactionHistory() {
   const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
   const pageData = filteredTransactions.slice(
     (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
+    page * ITEMS_PER_PAGE,
   );
 
   const renderPagination = () => {
@@ -45,7 +43,15 @@ export default function TransactionHistory() {
       if (page <= 4) {
         pages.push(1, 2, 3, 4, 5, '...', totalPages);
       } else if (page >= totalPages - 3) {
-        pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+        pages.push(
+          1,
+          '...',
+          totalPages - 4,
+          totalPages - 3,
+          totalPages - 2,
+          totalPages - 1,
+          totalPages,
+        );
       } else {
         pages.push(1, '...', page - 1, page, page + 1, '...', totalPages);
       }
@@ -53,7 +59,9 @@ export default function TransactionHistory() {
 
     return pages.map((p, idx) =>
       p === '...' ? (
-        <span key={`ellipsis-${idx}`} className={styles.ellipsis}>...</span>
+        <span key={`ellipsis-${idx}`} className={styles.ellipsis}>
+          ...
+        </span>
       ) : (
         <button
           key={p}
@@ -62,7 +70,7 @@ export default function TransactionHistory() {
         >
           {p}
         </button>
-      )
+      ),
     );
   };
 
@@ -79,14 +87,18 @@ export default function TransactionHistory() {
                   label="Start Date"
                   value={startDate}
                   onChange={(newValue) => setStartDate(newValue)}
-                  renderInput={(params) => <TextField {...params} size="small" />}
+                  renderInput={(params) => (
+                    <TextField {...params} size="small" />
+                  )}
                 />
                 <span className={styles.toLabel}>to</span>
                 <DatePicker
                   label="End Date"
                   value={endDate}
                   onChange={(newValue) => setEndDate(newValue)}
-                  renderInput={(params) => <TextField {...params} size="small" />}
+                  renderInput={(params) => (
+                    <TextField {...params} size="small" />
+                  )}
                 />
               </div>
             </LocalizationProvider>
@@ -105,9 +117,15 @@ export default function TransactionHistory() {
             <tbody>
               {pageData.map((t) => (
                 <tr key={t.id}>
-                  <td><i>{t.date}</i></td>
-                  <td><i>{t.status}</i></td>
-                  <td><i>{t.tutor}</i></td>
+                  <td>
+                    <i>{t.date}</i>
+                  </td>
+                  <td>
+                    <i>{t.status}</i>
+                  </td>
+                  <td>
+                    <i>{t.tutor}</i>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -116,11 +134,17 @@ export default function TransactionHistory() {
       </div>
 
       <div className={styles.pagination}>
-        <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
+        <button
+          onClick={() => setPage((p) => Math.max(p - 1, 1))}
+          disabled={page === 1}
+        >
           ← Previous
         </button>
         {renderPagination()}
-        <button onClick={() => setPage((p) => Math.min(p + 1, totalPages))} disabled={page === totalPages}>
+        <button
+          onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+          disabled={page === totalPages}
+        >
           Next →
         </button>
       </div>
