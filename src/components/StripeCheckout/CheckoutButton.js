@@ -1,55 +1,51 @@
 import { useRouter } from 'next/router';
-import { useAuth } from '../../services/context/AuthContext';
-import styles from './CheckoutButton.module.css';
+import { useState } from 'react';
 
-// This is what should be implemented on every tutor's profile page, i.e.,
-// Student selects Tutor Profile
-// Student selects from tutor's availability on the calendar
-// Prompts CheckoutButton
-const CheckoutButton = ({ tutorUid, selectedDateTime, duration }) => {
-  const router = useRouter();
-  const { currentUser } = useAuth();
+const CheckoutButton = ({ tutorId, dateTime, sessionId, tutorName }) => {
+	const router = useRouter();
+	const [isLoading, setIsLoading] = useState(false);
 
-  const handleCheckout = async () => {
-    try {
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          tutorUid,
-          studentUid: currentUser.uid,
-          dateTime: selectedDateTime, // This will be the timeslot/session the student selects from tutor profile
-          duration,
-        }),
-      });
+	const handleCheckout = async () => {
+		try {
+			setIsLoading(true);
 
-      if (!response.ok) {
-        throw new Error('Failed to create checkout session');
-      }
+			const response = await fetch('/api/create-checkout-session', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					sessionId: sessionId,
+				}),
+			});
 
-      const { clientSecret } = await response.json();
+			if (!response.ok) {
+				throw new Error('Failed to create checkout session');
+			}
 
-      localStorage.setItem('checkoutClientSecret', clientSecret);
-      localStorage.setItem('checkoutTutorUid', tutorUid);
+			const { clientSecret } = await response.json();
 
-      router.push('/Checkout');
-    } catch (error) {
-      console.log('Error initiating checkout:', error);
-      // Going to have it return a display on the page eventually
-    }
-  };
+			localStorage.setItem('checkoutClientSecret', clientSecret);
+			localStorage.setItem('checkoutTutorUid', tutorId);
+			localStorage.setItem('tutorDisplayName', tutorName || '');
 
-  return (
-    <button
-      onClick={handleCheckout}
-      className={styles.checkoutButton}
-      disabled={!selectedDateTime}
-    >
-      Proceed to Checkout
-    </button>
-  );
+			router.push('/CheckoutPage');
+		} catch (e) {
+			alert('Error initiating checkout:', e);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	return (
+		<button
+			onClick={handleCheckout}
+			className="btn btn-outline-primary btn-sm"
+			disabled={!dateTime || isLoading}
+		>
+			{isLoading ? 'Processing...' : 'Make Payment'}
+		</button>
+	);
 };
 
 export default CheckoutButton;
