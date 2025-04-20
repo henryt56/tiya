@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'react';
-import Link from 'next/Link';
+import Link from 'next/link';
 
 function ReturnPage() {
   const [status, setStatus] = useState(null);
