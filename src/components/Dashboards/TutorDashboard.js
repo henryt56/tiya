@@ -11,10 +11,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { useRouter } from 'next/router';
 
 const TutorDashboard = () => {
+  const router = useRouter();
   const [date, setDate] = useState(new Date());
-
   const verticalData = [
     { month: 'Jan', sessions: 12 },
     { month: 'Feb', sessions: 18 },
@@ -94,7 +95,20 @@ const TutorDashboard = () => {
           </div>
         </section>
       </div>
-
+      <div className="card mb-4 shadow-sm">
+        <div className="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 className="mb-0">Profile Management</h5>
+        </div>
+        <div className="card-body">
+          <p>Update your tutor profile information, availability, and certifications.</p>
+          <button 
+            className="btn btn-primary"
+            onClick={() => router.push('/TutorProfile')}
+          >
+            Update Profile
+          </button>
+        </div>
+      </div>
       <button className={styles.reportBtn}>Make a Report</button>
     </div>
   );
