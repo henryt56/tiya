@@ -23,6 +23,15 @@ export interface ReportMetadata {
 	data: ReportData;
 }
 
+export interface ReportQueryParams {
+	reportedId?: string;
+	reporterId?: string;
+	title?: string;
+	content?: string;
+	status?: string;
+	id?: string;
+}
+
 export function validateReport(
 	report: Partial<ReportData>,
 	options: { validateAll?: boolean } = { validateAll: false }, // more opts can be added later, e.g., allow empty, strict mode, ...
@@ -81,7 +90,7 @@ export function validateReport(
 		throw new Error('Creation timestamp must be a valid ISO date string.');
 	}
 
-	const validStatuses = ['pending assignee', 'in progress', 'complete']; // ts interfaces only exist at compile time... no easy way to port these over
+	const validStatuses = ['pending assignee', 'in progress', 'resolved']; // ts interfaces only exist at compile time... no easy way to port these over
 	if (options.validateAll && !report.status) {
 		throw new Error('Status is required.');
 	}
@@ -96,15 +105,19 @@ export function validateReport(
  * @param filters - An optional partial ReportData object containing the fields (report attributes) to filter by - all reports if no filter supplied.
  * @returns A promise that resolves to an array of reports.
  */
-async function fetchUserReports(
-	filters?: Partial<ReportData>,
+export async function fetchUserReports(
+	filters?: ReportQueryParams,
 ): Promise<ReportMetadata[]> {
 	try {
 		const reportsRef = collection(db, 'reports');
 		let q = query(reportsRef);
 
 		if (filters) {
-			Object.entries(filters).forEach(([key, value]) => {
+			// Filter out the id property since it's not a field in the document
+			const { id, ...docFilters } = filters;
+			
+			// Apply filters that exist in ReportData
+			Object.entries(docFilters).forEach(([key, value]) => {
 				if (value !== undefined) {
 					q = query(q, where(key as keyof ReportData, '==', value));
 				}
@@ -147,8 +160,8 @@ async function fetchUserReports(
 }
 
 const Report = () => {
-	const [reports, setReports] = useState([]); // these hooks wont allow type specification 🤔
-	const [reportQuery, setReportQuery] = useState({ queryType: 'all', id: '' });
+	const [reports, setReports] = useState<ReportMetadata[]>([]);
+	const [reportQuery, setReportQuery] = useState<ReportQueryParams>({ id: '' });
 	const [status, setStatus] = useState(''); // use for later modification... all we have atm is CR - now that i think about it we'll have to add `assignee` to metadata too
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
@@ -170,7 +183,7 @@ const Report = () => {
 	}, [reportQuery]);
 
 	const handleQueryChange = (
-		field: keyof ReportData | keyof ReportMetadata,
+		field: keyof ReportQueryParams,
 		value: string,
 	) => {
 		setReportQuery((prev) => ({
@@ -185,22 +198,22 @@ const Report = () => {
 			<div className="filters">
 				<input
 					type="text"
-					place="Search by Report ID"
+					placeholder="Search by Report ID"
 					onChange={(e) => handleQueryChange('id', e.target.value)}
 				/>
 				<input
 					type="text"
-					place="Search by Reported User ID"
+					placeholder="Search by Reported User ID"
 					onChange={(e) => handleQueryChange('reportedId', e.target.value)}
 				/>
 				<input
 					type="text"
-					place="Search by Reporting User ID"
+					placeholder="Search by Reporting User ID"
 					onChange={(e) => handleQueryChange('reporterId', e.target.value)}
 				/>
 				<select
 					onChange={(e) => handleQueryChange('status', e.target.value)}
-					deafultValue=""
+					defaultValue=""
 				>
 					<option value="">All Statuses</option>
 					<option value="pending assignee">Pending Assignee</option>

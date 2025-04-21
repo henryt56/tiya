@@ -1,9 +1,12 @@
-function AdminDashboardPage() {
+import ProtectedRoute from '../services/Routes/ProtectedRoute';
+import AdminDashboard from '../components/Dashboards/AdminDashboard';
+import SessionExpiryNotification from '../components/SessionExpiryNotification';
+
+export default function AdminDashboardPage() {
   return (
-    <div>
-      <h1>Admin Dashboard</h1>
-    </div>
+    <ProtectedRoute allowedRoles={['admin', 'it']}>
+      <AdminDashboard />
+      <SessionExpiryNotification />
+    </ProtectedRoute>
   );
 }
-
-export default AdminDashboardPage;
