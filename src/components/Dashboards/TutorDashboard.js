@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import styles from '../../styles/TutorDashboard.module.css';
@@ -13,10 +13,41 @@ import {
 } from 'recharts';
 import { useRouter } from 'next/router';
 import SessionManagement from './SessionManagement';
+import { useAuth } from '../../services/context/AuthContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
 
 const TutorDashboard = () => {
   const router = useRouter();
   const [date, setDate] = useState(new Date());
+  const { currentUser } = useAuth();
+  const [tutorName, setTutorName] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (currentUser && currentUser.uid) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            console.log('User data:', userData);
+            if (userData.displayName) {
+              setTutorName(userData.displayName);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [currentUser]);
 
   const horizontalData = [
     { student: 'Student A', reviews: 4 },
@@ -27,7 +58,11 @@ const TutorDashboard = () => {
 
   return (
     <div className={styles.dashboard}>
-      <h1>Welcome, Tutor 👋</h1>
+      <h1>
+        Welcome, {loading ?
+          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> :
+          tutorName || 'Tutor'} 👋
+      </h1>
 
       {/* Session Management */}
       <SessionManagement />
@@ -40,7 +75,7 @@ const TutorDashboard = () => {
           </div>
           <div className="card-body">
             <p>Update your tutor profile information, availability, and certifications.</p>
-            <button 
+            <button
               className="btn btn-primary"
               onClick={() => router.push('/TutorProfile')}
             >
@@ -62,11 +97,11 @@ const TutorDashboard = () => {
           <ResponsiveContainer width="100%" height={200}>
             <BarChart layout="vertical" data={horizontalData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-  type="number" 
-  domain={[0, 5]} 
-  ticks={[0, 1, 2, 3, 4, 5]} 
-/>
+              <XAxis
+                type="number"
+                domain={[0, 5]}
+                ticks={[0, 1, 2, 3, 4, 5]}
+              />
 
               <YAxis type="category" dataKey="student" />
               <Tooltip />
@@ -75,8 +110,6 @@ const TutorDashboard = () => {
           </ResponsiveContainer>
         </section>
       </div>
-
-      <button className={styles.reportBtn}>Make a Report</button> {/* Button to make a report. Feel free to add functionality to this button */}
     </div>
   );
 };
