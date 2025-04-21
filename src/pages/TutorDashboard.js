@@ -6,7 +6,6 @@ export default function TutorDashboardPage() {
   return (
     <ProtectedRoute allowedRoles={['tutor']}>
       <TutorDashboard />
-      <SessionManagement />
     </ProtectedRoute>
   );
 }
