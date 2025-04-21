@@ -1,0 +1,477 @@
+.dashboard {
+    padding: 2rem;
+    font-family: var(--font-montserrat);
+    color: #333;
+    background-color: #f7f9fc;
+    min-height: 100vh;
+}
+
+.dashboard h1 {
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.statsOverview {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.statCard {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.statCard:hover {
+    transform: translateY(-5px);
+}
+
+.statCard h3 {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.statNumber {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0072c6;
+    margin: 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 1.5rem;
+}
+
+.section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+.section:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.section h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+/* Reports Section */
+.reportsSection {
+    grid-column: span 2;
+    height: auto;
+    min-height: 350px;
+}
+
+.detailsSection {
+    height: auto;
+    min-height: 350px;
+}
+
+.reportFilters {
+    margin-bottom: 1rem;
+}
+
+.filterSelect {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background-color: white;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 250px;
+}
+
+.reportsList {
+    overflow-y: auto;
+    max-height: 500px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.reportItem {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.reportItem:hover,
+.reportItem.selected {
+    background-color: #f0f7ff;
+}
+
+.reportHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reportHeader h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.reportStatus {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.pendingassignee {
+    background-color: #fff4de;
+    color: #ff9800;
+}
+
+.inprogress {
+    background-color: #dcf5ff;
+    color: #03a9f4;
+}
+
+.resolved {
+    background-color: #e0f7e6;
+    color: #4caf50;
+}
+
+.reportDate {
+    font-size: 0.8rem;
+    color: #888;
+    margin: 0.25rem 0 0;
+}
+
+/* Report Details */
+.reportDetails {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.reportDetails h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.reportContent {
+    margin: 1rem 0;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    overflow-y: auto;
+    max-height: 120px;
+    flex-grow: 1;
+}
+
+.statusButtons {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.statusBtn {
+    padding: 0.4rem 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.statusBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pendingBtn {
+    background-color: #fff4de;
+    color: #ff9800;
+}
+
+.pendingBtn:hover:not(:disabled) {
+    background-color: #ffeccc;
+}
+
+.progressBtn {
+    background-color: #dcf5ff;
+    color: #03a9f4;
+}
+
+.progressBtn:hover:not(:disabled) {
+    background-color: #c7eeff;
+}
+
+.resolvedBtn {
+    background-color: #e0f7e6;
+    color: #4caf50;
+}
+
+.resolvedBtn:hover:not(:disabled) {
+    background-color: #d0f0d9;
+}
+
+/* Message System */
+.messageSystem {
+    margin-top: auto;
+}
+
+.messageSystem h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.messageInput {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    height: 100px;
+    resize: none;
+    margin-bottom: 0.75rem;
+    font-family: inherit;
+}
+
+.sendBtn {
+    padding: 0.5rem 1rem;
+    background-color: #0072c6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.sendBtn:hover:not(:disabled) {
+    background-color: #005da3;
+}
+
+.sendBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.selectPrompt {
+    font-size: 0.95rem;
+    color: #888;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* Admin Management Section */
+.adminSection {
+    grid-column: span 3;
+    height: auto;
+    min-height: 400px;
+}
+
+.adminCreationForm {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.adminCreationForm h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.formGroup {
+    margin-bottom: 1rem;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.formInput,
+.formSelect {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.formInput:focus,
+.formSelect:focus {
+    outline: none;
+    border-color: #0072c6;
+    box-shadow: 0 0 0 2px rgba(0, 114, 198, 0.2);
+}
+
+.helperText {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.formActions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.primaryBtn,
+.secondaryBtn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.primaryBtn {
+    background-color: #0072c6;
+    color: white;
+}
+
+.primaryBtn:hover {
+    background-color: #005da3;
+}
+
+.secondaryBtn {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.secondaryBtn:hover {
+    background-color: #e0e0e0;
+}
+
+.errorMessage {
+    padding: 0.75rem;
+    background-color: #fef0f0;
+    color: #d32f2f;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.successMessage {
+    padding: 0.75rem;
+    background-color: #f0faf0;
+    color: #388e3c;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.passwordWarning {
+    font-weight: bold;
+    color: #ff9800;
+    margin-top: 0.5rem;
+}
+
+.adminList {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.adminListHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.adminListHeader h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.adminTable {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.adminTableHeader {
+    display: grid;
+    grid-template-columns: 1.5fr 0.8fr 0.8fr 0.8fr;
+    padding: 0.75rem 1rem;
+    background-color: #f5f7fa;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #eee;
+}
+
+.adminTableRow {
+    display: grid;
+    grid-template-columns: 1.5fr 0.8fr 0.8fr 0.8fr;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.adminTableRow:last-child {
+    border-bottom: none;
+}
+
+.adminTableRow:hover {
+    background-color: #f9fafc;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .reportsSection {
+        grid-column: span 1;
+    }
+
+    .adminSection {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .statsOverview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .adminSection {
+        grid-column: span 1;
+    }
+
+    .adminTableHeader,
+    .adminTableRow {
+        grid-template-columns: 1.5fr 0.8fr 1fr 1fr;
+        font-size: 0.85rem;
+    }
+}

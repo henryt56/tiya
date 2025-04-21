@@ -42,11 +42,13 @@ service cloud.firestore {
     }
     
     match /reports/{reportId} {
-    // Any authenticated user can create a report
-  	allow create: if request.auth != null;
-  
-  	// Temporarily disallow any user from touching reports until Auth (for Admin & IT) are implemented
-  	allow read, update, delete: if false;
+      // Allow only authenticated users to create reports
+      allow create: if request.auth != null;
+
+      // Allow only admins to read or update reports
+      allow read, update: if request.auth != null &&
+          (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' || 
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'it');
     }
     
     match /{document=**} {
