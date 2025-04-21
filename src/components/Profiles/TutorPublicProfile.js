@@ -99,6 +99,15 @@ const TutorPublicProfile = () => {
 		));
 	};
 
+	// Handle report user action
+	const handleReportUser = () => {
+		if (currentUser) {
+			router.push(`/Report?reportedId=${id}`);
+		} else {
+			router.push(`/Login?redirect=report?reportedId=${id}`);
+		}
+	};
+
 	if (loading) {
 		return (
 			<div className="d-flex justify-content-center py-5">
@@ -179,11 +188,30 @@ const TutorPublicProfile = () => {
 							</div>
 
 							{currentUser && currentUser.uid !== id && (
-								<MessageButton
-									userId={tutor.id}
-									userName={tutor.displayName}
-									userRole={tutor.role}
-								/>
+								<div className="d-flex flex-column gap-2">
+									<MessageButton
+										userId={tutor.id}
+										userName={tutor.displayName}
+										userRole={tutor.role}
+									/>
+									<button
+										onClick={handleReportUser}
+										className="btn btn-outline-danger btn-sm"
+									>
+										<i className="bi bi-flag me-1"></i>
+										Report User
+									</button>
+								</div>
+							)}
+
+							{!currentUser && (
+								<button
+									onClick={handleReportUser}
+									className="btn btn-outline-danger btn-sm mt-2"
+								>
+									<i className="bi bi-flag me-1"></i>
+									Report User
+								</button>
 							)}
 						</div>
 					</div>
