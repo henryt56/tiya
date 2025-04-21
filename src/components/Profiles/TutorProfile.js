@@ -4,6 +4,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../../firebaseConfig';
 import { useAuth } from '../../services/context/AuthContext';
+import { syncUserToTutor } from '../../services/utilities/firebaseSync';
 
 const TutorProfile = () => {
   const { currentUser } = useAuth();
@@ -34,7 +35,12 @@ const TutorProfile = () => {
     profilePhoto: '',
     certifications: [],
     languages: [],
+    email: '',
+    phone: '',
+    location: '',
+    coordinates: null
   });
+  
   
   // For adding new subjects
   const [newSubject, setNewSubject] = useState('');
@@ -249,23 +255,38 @@ const TutorProfile = () => {
     setMessage({ text: '', type: '' });
     
     try {
-      let profilePhotoURL = profileData.profilePhoto;
+      // Create updated user data first, without the new photo
+      let updatedUserData = {
+        ...profileData,
+        profileComplete: true,
+        updatedAt: new Date().toISOString()
+      };
       
-      // Upload profile photo if new one selected
+      // Handle photo upload separately
       if (profilePhotoFile) {
-        const storageRef = ref(storage, `profile-photos/${currentUser.uid}`);
-        await uploadBytes(storageRef, profilePhotoFile);
-        profilePhotoURL = await getDownloadURL(storageRef);
+        try {
+          // Create a storage reference with a unique path
+          const storageRef = ref(storage, `profile-photos/${currentUser.uid}`);
+          
+          // Upload the file
+          await uploadBytes(storageRef, profilePhotoFile);
+          console.log('File uploaded successfully');
+          
+          // Get the download URL
+          const photoURL = await getDownloadURL(storageRef);
+          console.log('Download URL retrieved:', photoURL);
+          
+          // Update the data object with the photo URL
+          updatedUserData.profilePhoto = photoURL;
+        } catch (uploadError) {
+          console.error('Error uploading profile photo:', uploadError);
+          // Continue with the save without updating the photo
+        }
       }
       
       // Update profile data in Firestore
       const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, {
-        ...profileData,
-        profilePhoto: profilePhotoURL,
-        profileComplete: true,
-        updatedAt: new Date().toISOString()
-      });
+      await updateDoc(userRef, updatedUserData);
       
       setMessage({ text: 'Profile saved successfully!', type: 'success' });
       
@@ -654,6 +675,51 @@ const TutorProfile = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        <div className="card mb-4 shadow-sm">
+          <div className="card-header bg-white">
+            <h2 className="h5 mb-0 text-primary">Contact Information</h2>
+          </div>
+          <div className="card-body">
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">Email</label>
+              <input
+                id="email"
+                type="email"
+                className="form-control"
+                value={profileData.email}
+                onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                placeholder="Your contact email"
+              />
+            </div>
+            
+            <div className="mb-3">
+              <label htmlFor="phone" className="form-label">Phone Number (optional)</label>
+              <input
+                id="phone"
+                type="tel"
+                className="form-control"
+                value={profileData.phone || ''}
+                onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                placeholder="Your phone number"
+              />
+            </div>
+            
+            <div className="mb-3">
+              <label htmlFor="location" className="form-label">Location</label>
+              <input
+                id="location"
+                type="text"
+                className="form-control"
+                value={profileData.location || ''}
+                onChange={(e) => setProfileData({...profileData, location: e.target.value})}
+                placeholder="City, State"
+              />
+              <small className="text-muted">This helps students find tutors in their area</small>
             </div>
           </div>
         </div>
