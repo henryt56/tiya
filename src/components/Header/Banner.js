@@ -87,11 +87,6 @@ export default function Banner() {
 								</Link>
 							</>
 						)}
-						{currentUser && userRole === 'tutor' && (
-							<Link href="/Sessions" className={styles.navLink}>
-								My Sessions
-							</Link>
-						)}
 						<Link href="/About" className={styles.navLink}>
 							About Us
 						</Link>
