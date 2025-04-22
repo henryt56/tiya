@@ -3,6 +3,9 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
+import { useRouter } from 'next/router';
 import styles from '../../styles/AdminDashboard.module.css';
 import { useAuth } from '../../services/context/AuthContext';
 import { useSessionTimeout } from '../../services/context/AuthContext';
@@ -15,6 +18,10 @@ import {
   updateReportStatus,
   getWeeklyUserActivity
 } from '../../services/Reports/ReportStats';
+import { sendReportEmail, getUserEmail } from '../../services/Reports/ReportEmailService';
+import { format } from 'date-fns';
+
+const ADMIN_SESSION_KEY = 'admin_session';
 
 const AdminDashboard = () => {
   // Use session timeout hook for admin users
@@ -27,6 +34,14 @@ const AdminDashboard = () => {
   const [messageText, setMessageText] = useState('');
   const [reportFilter, setReportFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+
+  // User display name states
+  const [reportedUserName, setReportedUserName] = useState("");
+  const [reporterName, setReporterName] = useState("");
+
+  // Email state
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailError, setEmailError] = useState('');
 
   // Chart data state
   const [statusData, setStatusData] = useState([]);
@@ -95,18 +110,78 @@ const AdminDashboard = () => {
   // Chart colors
   const COLORS = ['#0088FE', '#FF8042', '#00C49F', '#FFBB28'];
 
-  const handleReportSelect = (report) => {
+  // Helper function to get user display name
+  const fetchUserDisplayName = async (userId) => {
+    try {
+      // This is a simplified implementation - you might have a dedicated service for this
+      const userRef = doc(db, 'users', userId);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        // Return display name or username, falling back to email or user ID
+        return userData.displayName || userData.username || userData.email || userId;
+      }
+      return "Unknown User";
+    } catch (error) {
+      console.error('Error fetching user display name:', error);
+      return "Unknown User";
+    }
+  };
+
+  // Format timestamp to human-readable date
+  const formatDate = (timestamp) => {
+    try {
+      // Handle Firebase timestamp or ISO string
+      const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+      return format(date, 'MMM d, yyyy h:mm a');
+    } catch (error) {
+      return timestamp; // Return the original timestamp if formatting fails
+    }
+  };
+
+  const handleReportSelect = async (report) => {
     setSelectedReport(report);
     // Reset any previous errors
     setStatusUpdateError('');
+    setEmailError('');
+
+    // Fetch display names for reported user and reporter
+    try {
+      setReportedUserName(await fetchUserDisplayName(report.reportedId));
+      setReporterName(await fetchUserDisplayName(report.reporterId));
+    } catch (error) {
+      console.error('Error fetching user display names:', error);
+    }
   };
 
-  const handleSendMessage = () => {
-    if (!messageText.trim()) return;
+  const handleSendMessage = async () => {
+    if (!messageText.trim() || !selectedReport) return;
 
-    // In a real app, you would send this message to the user
-    alert(`Message sent to user ${selectedReport.reportedId}: ${messageText}`);
-    setMessageText('');
+    try {
+      setSendingEmail(true);
+      setEmailError('');
+
+      // Use the mailto protocol to open default email client
+      const success = await sendReportEmail(
+        selectedReport.id,
+        selectedReport.title,
+        selectedReport.reporterId,
+        messageText
+      );
+
+      if (success) {
+        // Clear message text after sending
+        setMessageText('');
+      } else {
+        setEmailError('Failed to open email client. Please check if reporter has a valid email.');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setEmailError('Failed to send message. Please try again.');
+    } finally {
+      setSendingEmail(false);
+    }
   };
 
   // Handle Firebase report status update
@@ -432,7 +507,7 @@ const AdminDashboard = () => {
                           {report.status}
                         </span>
                       </div>
-                      <p className={styles.reportDate}>Reported on: {report.createdAt}</p>
+                      <p className={styles.reportDate}>Reported on: {formatDate(report.createdAt)}</p>
                     </div>
                   ))
                 ) : (
@@ -443,18 +518,45 @@ const AdminDashboard = () => {
 
             {/* Report Details & Message System */}
             <section className={`${styles.section} ${styles.detailsSection}`}>
-              <h2>Report Details</h2>
+              <h2 className={styles.sectionTitle}>Report Details</h2>
 
               {selectedReport ? (
                 <div className={styles.reportDetails}>
-                  <h3>{selectedReport.title}</h3>
-                  <p><strong>Status:</strong> <span className={styles[selectedReport.status.replace(' ', '')]}>{selectedReport.status}</span></p>
-                  <p><strong>Reported User:</strong> {selectedReport.reportedId}</p>
-                  <p><strong>Reporter:</strong> {selectedReport.reporterId}</p>
-                  <p><strong>Date:</strong> {selectedReport.createdAt}</p>
+                  <h3 className={styles.reportTitle}>{selectedReport.title}</h3>
+
+                  <div className={styles.statusDisplay}>
+                    <span className={styles.label}>Status:</span>
+                    <span className={`${styles.reportStatus} ${styles[selectedReport.status.replace(' ', '')]}`}>
+                      {selectedReport.status}
+                    </span>
+                  </div>
+
+                  <div className={styles.userInfoBox}>
+                    <div className={styles.userInfo}>
+                      <span className={styles.label}>Reported User:</span>
+                      <div className={styles.userName}>{reportedUserName || "Loading..."}
+                        <div className={styles.userId}>{selectedReport.reportedId}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.userInfoBox}>
+                    <div className={styles.userInfo}>
+                      <span className={styles.label}>Reporter:</span>
+                      <div className={styles.userName}>{reporterName || "Loading..."}
+                        <div className={styles.userId}>{selectedReport.reporterId}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.dateInfo}>
+                    <span className={styles.label}>Date:</span>
+                    <span className={styles.dateValue}>{formatDate(selectedReport.createdAt)}</span>
+                  </div>
+
                   <div className={styles.reportContent}>
-                    <p><strong>Content:</strong></p>
-                    <p>{selectedReport.content}</p>
+                    <div className={styles.contentLabel}>Content:</div>
+                    <p className={styles.contentText}>{selectedReport.content}</p>
                   </div>
 
                   {statusUpdateError && (
@@ -488,20 +590,33 @@ const AdminDashboard = () => {
                   </div>
 
                   <div className={styles.messageSystem}>
-                    <h4>Message User</h4>
-                    <textarea
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      placeholder="Type a message to the user..."
-                      className={styles.messageInput}
-                    ></textarea>
-                    <button
-                      className={styles.sendBtn}
-                      onClick={handleSendMessage}
-                      disabled={!messageText.trim()}
-                    >
-                      Send Message
-                    </button>
+                    <h4 className={styles.messageHeader}>Email User</h4>
+
+                    {emailError && (
+                      <div className={styles.errorMessage}>
+                        {emailError}
+                      </div>
+                    )}
+
+                    <div className={styles.emailForm}>
+                      <p className={styles.emailNote}>
+                        Sending an email will open your default email client with a pre-populated message.
+                        The reporter can reply directly to continue the conversation.
+                      </p>
+                      <textarea
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
+                        placeholder="Type your message to the reporter..."
+                        className={styles.messageInput}
+                      ></textarea>
+                      <button
+                        className={styles.sendBtn}
+                        onClick={handleSendMessage}
+                        disabled={!messageText.trim() || sendingEmail}
+                      >
+                        {sendingEmail ? 'Opening Email Client...' : 'Send Email'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (

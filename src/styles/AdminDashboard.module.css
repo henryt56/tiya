@@ -475,3 +475,167 @@
         font-size: 0.85rem;
     }
 }
+
+/* Report Details section */
+
+.reportTitle {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.sectionTitle {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: #444;
+}
+
+.statusDisplay {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.userInfoBox {
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0;
+}
+
+.userInfo {
+    display: flex;
+    align-items: flex-start;
+}
+
+.userName {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.userId {
+    font-size: 0.7rem;
+    color: #666;
+    margin-top: 0.2rem;
+    font-weight: normal;
+    word-break: break-all;
+}
+
+.label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+    min-width: 100px;
+    display: inline-block;
+}
+
+.dateInfo {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.dateValue {
+    font-size: 0.85rem;
+    color: #444;
+}
+
+.reportContent {
+    background-color: #f9f9f9;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+}
+
+.contentLabel {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.contentText {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.messageHeader {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #444;
+}
+
+.emailNote {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.messageInput {
+    font-size: 0.85rem;
+}
+
+.reportDate {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+/* Adjust existing styles to work with the new ones */
+
+.reportDetails {
+    font-size: 0.85rem;
+}
+
+.statusBtn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+}
+
+.sendBtn {
+    font-size: 0.85rem;
+}
+
+.detailsSection {
+    padding: 1rem;
+}
+
+.emailForm {
+    margin-top: 0.5rem;
+}
+
+/* Status styles */
+.reportStatus {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.pendingassignee {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.inprogress {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.resolved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Error message styling */
+.errorMessage {
+    font-size: 0.8rem;
+    color: #721c24;
+    background-color: #f8d7da;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
