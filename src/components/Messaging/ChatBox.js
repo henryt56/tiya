@@ -39,12 +39,16 @@ const ChatBox = ({
 					const partnerRole = partnerData?.role;
 					const profilePhoto = partnerData?.profilePhoto || null;
 
+					const partnerName =
+						partnerData?.displayName || conversation.partnerName;
+
 					if (
 						(userRole === 'student' && partnerRole === 'tutor') ||
 						(userRole === 'tutor' && partnerRole === 'student')
 					) {
 						filteredConversations.push({
 							...conversation,
+							partnerName,
 							partnerRole,
 							profilePhoto,
 						});
@@ -68,15 +72,23 @@ const ChatBox = ({
 						selectConversation(targetConvo);
 					} else {
 						const userData = await getUserData(initialUserId);
-
+						console.log('DEBUGGING NEW CONVERSATION:');
+						console.log('- userData:', userData);
+						console.log('- initialUserId:', initialUserId);
+						console.log('- initialUserName:', initialUserName);
 						if (
 							userData &&
 							((userRole === 'student' && userData.role === 'tutor') ||
 								(userRole === 'tutor' && userData.role === 'student'))
 						) {
+							console.log(
+								'Creating new conversation with user:',
+								userData.displayName,
+							);
+
 							const newConvo = {
 								partnerId: initialUserId,
-								partnerName: initialUserName || userData.displayName || 'User',
+								partnerName: userData.displayName,
 								partnerRole: userData.role,
 								profilePhoto: userData.profilePhoto || null,
 								messages: [],
@@ -131,11 +143,14 @@ const ChatBox = ({
 		if (!newMessage.trim() || !activeConversation) return;
 
 		try {
+			const userData = await getUserData(currentUser.uid);
+			const partnerData = await getUserData(activeConversation.partnerId);
+
 			await sendMessage(
 				currentUser.uid,
-				currentUser.displayName || 'User',
+				userData.displayName || 'User',
 				activeConversation.partnerId,
-				activeConversation.partnerName,
+				partnerData.displayName,
 				newMessage.trim(),
 			);
 			setNewMessage('');
