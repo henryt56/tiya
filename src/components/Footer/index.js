@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './Footer.module.css';
+import Link from 'next/link';
 import { FaFacebookF, FaLinkedinIn, FaYoutube, FaInstagram } from 'react-icons/fa';
 
 const Footer = () => {
@@ -10,29 +11,29 @@ const Footer = () => {
 
         <div className={styles.columns}>
           <div>
-            <h4>Contact Us</h4>
             <ul>
-              <li><a href="#">Careers</a></li>
-              <li><a href="#">Questions & Answers</a></li>
-              <li><a href="#">Privacy Policy</a></li>
+              <li><Link href="/Contact"><strong>Contact Us</strong></Link></li>
+              <li>Careers</li>
+              <li>Questions & Answers</li>
+              <li>Privacy Policy</li>
             </ul>
           </div>
 
           <div>
-            <h4>Register</h4>
             <ul>
-              <li><a href="#">Homework Help</a></li>
-              <li><a href="#">Test Prep</a></li>
-              <li><a href="#">Page</a></li>
+              <li><Link href="/Register"><strong>Register</strong></Link></li>
+              <li>Homework Help</li>
+              <li>Test Prep</li>
+              <li>Become a Tutor</li>
             </ul>
           </div>
 
           <div>
-            <h4>About Us</h4>
             <ul>
-              <li><a href="#">Site Map</a></li>
-              <li><a href="#">Help Center</a></li>
-              <li><a href="#">Tips and Tricks</a></li>
+              <li><Link href="/About"><strong>About Us</strong></Link></li>
+              <li>Site Map</li>
+              <li>Help Center</li>
+              <li>Tips and Tricks</li>
             </ul>
           </div>
         </div>
