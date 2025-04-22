@@ -11,12 +11,12 @@ export default function Search() {
   const router = useRouter();
   const { q } = router.query;
 
-  // Combined tutor list from both sources
+  // State for tutor list and filters
   const [tutorList, setTutorList] = useState([]);
   const [globalSearch, setGlobalSearch] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('All');
   const [selectedLanguage, setSelectedLanguage] = useState('All');
-  const [selectedAvailability, setSelectedAvailability] = useState('All');
+  const [selectedDay, setSelectedDay] = useState('All');
   const [selectedRating, setSelectedRating] = useState('All');
   const [selectedPrice, setSelectedPrice] = useState('All');
   const [sortOption, setSortOption] = useState('distance');
@@ -25,39 +25,30 @@ export default function Search() {
   const [radius, setRadius] = useState(10);
   const [zipCoords, setZipCoords] = useState(null);
 
+  // Fetch tutors from users collection only
   useEffect(() => {
-    const fetchAllTutors = async () => {
+    const fetchTutors = async () => {
       try {
-        // Fetch from tutors collection
-        const tutorsSnapshot = await getDocs(collection(db, 'tutors'));
-        const tutorsData = tutorsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        // Fetch from users collection (tutors only)
+        // Only fetch from users collection (tutors only with completed profiles)
         const usersTutorsQuery = query(
           collection(db, 'users'), 
           where('role', '==', 'tutor'),
           where('profileComplete', '==', true)
         );
-        const usersTutorsSnapshot = await getDocs(usersTutorsQuery);
+        const tutorsSnapshot = await getDocs(usersTutorsQuery);
         
-        // Map user tutors to the same format as the tutors collection
-        const usersTutorsData = usersTutorsSnapshot.docs.map(doc => {
+        // Map user tutors to the format needed for display
+        const tutorsData = tutorsSnapshot.docs.map(doc => {
           const userData = doc.data();
-          // Check if this user is already in tutors collection
-          const existsInTutors = tutorsData.some(t => t.id === doc.id);
           
-          // If already exists, skip
-          if (existsInTutors) return null;
-          
-          // Create a compatible tutor object from user data
           return {
             id: doc.id,
             name: userData.displayName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
-            subject: userData.subjects ? userData.subjects[0] || "" : "",
-            language: userData.languages ? userData.languages[0] || "" : "",
-            availability: userData.availability ? Object.keys(userData.availability)
-              .filter(day => userData.availability[day].available)
-              .join(", ") : "",
+            subject: userData.subjects && userData.subjects.length > 0 ? userData.subjects[0] : "",
+            subjects: userData.subjects || [],
+            language: userData.languages && userData.languages.length > 0 ? userData.languages[0] : "",
+            languages: userData.languages || [],
+            availability: userData.availability || {},
             location: userData.location || "",
             price: Number(userData.hourlyRate) || 0,
             rating: userData.rating || 0,
@@ -66,17 +57,15 @@ export default function Search() {
               userData.certifications.map(cert => cert.name).join(", ") : "",
             coordinates: userData.coordinates || null
           };
-        }).filter(Boolean); // Remove null entries
+        });
         
-        // Combine both lists
-        const combinedTutors = [...tutorsData, ...usersTutorsData];
-        setTutorList(combinedTutors);
+        setTutorList(tutorsData);
       } catch (error) {
         console.error('Error fetching tutors:', error);
       }
     };
     
-    fetchAllTutors();
+    fetchTutors();
   }, []);
 
   useEffect(() => {
@@ -122,10 +111,27 @@ export default function Search() {
   };
 
   const relevanceScore = (tutor, query) => {
-    const fields = [tutor.name, tutor.subject, tutor.language, tutor.availability, tutor.location];
+    const fields = [
+      tutor.name, 
+      ...(tutor.subjects || []), 
+      ...(tutor.languages || []), 
+      tutor.location
+    ];
+    
     return fields.reduce((score, field) =>
       score + (field?.toLowerCase().includes(query.toLowerCase()) ? 1 : 0), 0
     );
+  };
+
+  // Check if tutor is available on the selected day
+  const checkDayAvailability = (tutor, selectedDay) => {
+    if (selectedDay === 'All') return true;
+    
+    const availability = tutor.availability || {};
+    return availability[selectedDay.toLowerCase()] && 
+           availability[selectedDay.toLowerCase()].available &&
+           availability[selectedDay.toLowerCase()].slots &&
+           availability[selectedDay.toLowerCase()].slots.length > 0;
   };
 
   const filteredTutors = tutorList.filter((t) => {
@@ -133,9 +139,8 @@ export default function Search() {
     const matchesSearch =
       !q ||
       t.name.toLowerCase().includes(q) ||
-      t.subject.toLowerCase().includes(q) ||
-      t.language.toLowerCase().includes(q) ||
-      t.availability.toLowerCase().includes(q) ||
+      (t.subjects || []).some(subj => subj.toLowerCase().includes(q)) ||
+      (t.languages || []).some(lang => lang.toLowerCase().includes(q)) ||
       (t.location?.toLowerCase() || '').includes(q) ||
       t.price?.toString().includes(q) ||
       t.rating?.toString().includes(q);
@@ -146,9 +151,9 @@ export default function Search() {
 
     return (
       matchesSearch &&
-      (selectedSubject === 'All' || t.subject === selectedSubject) &&
-      (selectedLanguage === 'All' || t.language === selectedLanguage) &&
-      (selectedAvailability === 'All' || t.availability === selectedAvailability) &&
+      (selectedSubject === 'All' || (t.subjects || []).includes(selectedSubject)) &&
+      (selectedLanguage === 'All' || (t.languages || []).includes(selectedLanguage)) &&
+      checkDayAvailability(t, selectedDay) &&
       (selectedRating === 'All' || Math.floor(t.rating) >= parseInt(selectedRating)) &&
       (selectedPrice === 'All' ||
         (selectedPrice === '<20' && t.price < 20) ||
@@ -158,13 +163,35 @@ export default function Search() {
     );
   });
 
-  console.log('Filtered tutors count:', filteredTutors.length);
+  // Get unique subjects and languages from all tutors for filter options
+  const allSubjects = [...new Set(tutorList.flatMap(t => t.subjects || []))].filter(Boolean);
+  const allLanguages = [...new Set(tutorList.flatMap(t => t.languages || []))].filter(Boolean);
 
-  const uniqueTutors = Array.from(
-    new Map(filteredTutors.map(t => [`${t.name}-${t.subject}`, t])).values()
-  );
+  // Format availability days for display
+  const formatAvailabilityDays = (tutor) => {
+    if (!tutor.availability) return '';
+    
+    const availableDays = Object.entries(tutor.availability)
+      .filter(([_, dayData]) => dayData.available && dayData.slots && dayData.slots.length > 0)
+      .map(([day]) => day.charAt(0).toUpperCase() + day.slice(1))
+      .join(", ");
+    
+    return availableDays;
+  };
 
-  const sortedTutors = [...uniqueTutors].sort((a, b) => {
+  // Format time in AM/PM
+  const formatTimeAMPM = (timeString) => {
+    if (!timeString) return '';
+    
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    
+    return `${formattedHour}:${minutes} ${ampm}`;
+  };
+
+  const sortedTutors = [...filteredTutors].sort((a, b) => {
     if (sortOption === 'lowToHigh') return a.price - b.price;
     if (sortOption === 'highToLow') return b.price - a.price;
     if (sortOption === 'relevance') return relevanceScore(b, globalSearch) - relevanceScore(a, globalSearch);
@@ -214,29 +241,25 @@ export default function Search() {
       <div className={styles.filterBar}>
         <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} className={styles.filterPill}>
           <option value="All">Subject</option>
-          <option>Mathematics</option>
-          <option>Reading & Writing</option>
-          <option>Science</option>
-          <option>History</option>
+          {allSubjects.map(subject => (
+            <option key={subject} value={subject}>{subject}</option>
+          ))}
         </select>
         <select value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.target.value)} className={styles.filterPill}>
           <option value="All">Language</option>
-          <option>English</option>
-          <option>Spanish</option>
-          <option>French</option>
-          <option>German</option>
+          {allLanguages.map(language => (
+            <option key={language} value={language}>{language}</option>
+          ))}
         </select>
-        <select value={selectedAvailability} onChange={(e) => setSelectedAvailability(e.target.value)} className={styles.filterPill}>
+        <select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className={styles.filterPill}>
           <option value="All">Availability</option>
-          <option>Weekdays</option>
-          <option>Weekends</option>
-          <option>Evenings</option>
-        </select>
-        <select value={selectedRating} onChange={(e) => setSelectedRating(e.target.value)} className={styles.filterPill}>
-          <option value="All">Rating</option>
-          <option value="5">5+</option>
-          <option value="4">4+</option>
-          <option value="3">3+</option>
+          <option value="monday">Monday</option>
+          <option value="tuesday">Tuesday</option>
+          <option value="wednesday">Wednesday</option>
+          <option value="thursday">Thursday</option>
+          <option value="friday">Friday</option>
+          <option value="saturday">Saturday</option>
+          <option value="sunday">Sunday</option>
         </select>
         <select value={selectedPrice} onChange={(e) => setSelectedPrice(e.target.value)} className={styles.filterPill}>
           <option value="All">Price</option>
@@ -259,19 +282,24 @@ export default function Search() {
             <section
               key={tutor.id || `${tutor.name}-${index}`}
               className={styles.cardSmallBox}
-               //  Feel free to integrate the tutor profile here. Replace this with routing to a unique tutor id or tutor profile component
               onClick={() => router.push(`/TutorPublicProfile?id=${tutor.id}`)}
               style={{ cursor: 'pointer' }}
             >
-              <img src={tutor.image} alt={tutor.name} className={styles.cardImageSmall} />
+              <img src={tutor.image || '/images/default-profile.png'} alt={tutor.name} className={styles.cardImageSmall} />
               <div className={styles.cardContentSmall}>
                 <h2>{tutor.name}</h2>
-                <p className={styles.detail}>{tutor.subject}</p>
-                <p className={styles.detail}>{tutor.language}</p>
+                <p className={styles.detail}>
+                  {tutor.subjects && tutor.subjects.slice(0, 2).join(", ")}
+                  {tutor.subjects && tutor.subjects.length > 2 ? ', ...' : ''}
+                </p>
+                <p className={styles.detail}>
+                  {tutor.languages && tutor.languages.slice(0, 2).join(", ")}
+                  {tutor.languages && tutor.languages.length > 2 ? ', ...' : ''}
+                </p>
                 <p className={styles.detail}>{tutor.certifications}</p>
-                <p className={styles.detail}>⭐ {tutor.rating} — {tutor.availability}</p>
+                <p className={styles.detail}>📅 Available: {formatAvailabilityDays(tutor)}</p>
                 <p className={styles.detail}>📍 {tutor.location}{getDistanceLabel(tutor)}</p>
-                <p className={styles.detail}>💵 ${tutor.price}</p>
+                <p className={styles.detail}>💵 ${tutor.price}/hr</p>
               </div>
             </section>
           ))

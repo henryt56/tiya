@@ -14,6 +14,46 @@ const TutorProfile = () => {
   const [message, setMessage] = useState({ text: '', type: '' });
   const [isNewUser, setIsNewUser] = useState(false);
   
+  // Generate time options with 30-minute intervals (change to 15 if preferred)
+  const generateTimeOptions = (interval = 30) => {
+    const options = [];
+    const totalMinutesInDay = 24 * 60;
+    
+    for (let minutes = 0; minutes < totalMinutesInDay; minutes += interval) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      
+      // Format hours for 12-hour clock with AM/PM
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours % 12 || 12;
+      
+      // Format as HH:MM for value (24-hour for database)
+      const value = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+      
+      // Format as "1:30 PM" for display
+      const display = `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
+      
+      options.push({ value, display });
+    }
+    
+    return options;
+  };
+  
+  // Create time options with 30-minute intervals
+  const timeOptions = generateTimeOptions(30);
+  
+  // Format time from 24h to 12h with AM/PM
+  const formatTimeAMPM = (timeString) => {
+    if (!timeString) return '';
+    
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    
+    return `${formattedHour}:${minutes} ${ampm}`;
+  };
+  
   // Profile fields
   const [profileData, setProfileData] = useState({
     displayName: '',
@@ -221,6 +261,12 @@ const TutorProfile = () => {
   // Add time slot
   const handleAddTimeSlot = (day, startTime, endTime) => {
     if (startTime && endTime) {
+      // Validate that end time is after start time
+      if (startTime >= endTime) {
+        alert('End time must be after start time');
+        return;
+      }
+      
       setProfileData(prev => ({
         ...prev,
         availability: {
@@ -626,7 +672,7 @@ const TutorProfile = () => {
                           <div className="mb-3">
                             {dayData.slots.map((slot, idx) => (
                               <div key={idx} className="d-flex align-items-center bg-light p-2 mb-2 rounded">
-                                <span>{slot.start} - {slot.end}</span>
+                                <span>{formatTimeAMPM(slot.start)} - {formatTimeAMPM(slot.end)}</span>
                                 <button
                                   type="button"
                                   className="btn btn-sm text-danger ms-auto"
@@ -641,18 +687,32 @@ const TutorProfile = () => {
                         
                         <div className="row g-2">
                           <div className="col-5">
-                            <input 
-                              type="time" 
+                            <select 
                               id={`${day}-start`} 
-                              className="form-control"
-                            />
+                              className="form-select"
+                              aria-label="Start time"
+                            >
+                              <option value="">Start time</option>
+                              {timeOptions.map((time, idx) => (
+                                <option key={`start-${idx}`} value={time.value}>
+                                  {time.display}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                           <div className="col-5">
-                            <input 
-                              type="time" 
+                            <select 
                               id={`${day}-end`} 
-                              className="form-control" 
-                            />
+                              className="form-select"
+                              aria-label="End time"
+                            >
+                              <option value="">End time</option>
+                              {timeOptions.map((time, idx) => (
+                                <option key={`end-${idx}`} value={time.value}>
+                                  {time.display}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                           <div className="col-2">
                             <button
@@ -661,9 +721,18 @@ const TutorProfile = () => {
                               onClick={() => {
                                 const startEl = document.getElementById(`${day}-start`);
                                 const endEl = document.getElementById(`${day}-end`);
-                                handleAddTimeSlot(day, startEl.value, endEl.value);
-                                startEl.value = '';
-                                endEl.value = '';
+                                if(startEl.value && endEl.value) {
+                                  // Validate that end time is after start time
+                                  if(startEl.value >= endEl.value) {
+                                    alert('End time must be after start time');
+                                    return;
+                                  }
+                                  handleAddTimeSlot(day, startEl.value, endEl.value);
+                                  startEl.value = '';
+                                  endEl.value = '';
+                                } else {
+                                  alert('Please select both start and end times');
+                                }
                               }}
                             >
                               <i className="bi bi-plus"></i>
