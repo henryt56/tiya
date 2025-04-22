@@ -1,4 +1,4 @@
-// Updated Search.js component
+// Updated Search.js component with improved search cards
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/Search.module.css';
 import { useRouter } from 'next/router';
@@ -169,14 +169,14 @@ export default function Search() {
 
   // Format availability days for display
   const formatAvailabilityDays = (tutor) => {
-    if (!tutor.availability) return '';
+    if (!tutor.availability) return 'No availability set';
     
     const availableDays = Object.entries(tutor.availability)
       .filter(([_, dayData]) => dayData.available && dayData.slots && dayData.slots.length > 0)
       .map(([day]) => day.charAt(0).toUpperCase() + day.slice(1))
       .join(", ");
     
-    return availableDays;
+    return availableDays || 'No availability set';
   };
 
   // Format time in AM/PM
@@ -206,107 +206,244 @@ export default function Search() {
   const getDistanceLabel = (tutor) => {
     if (!zipCoords || !tutor.coordinates) return '';
     const dist = calculateDistance(zipCoords.lat, zipCoords.lng, tutor.coordinates.lat, tutor.coordinates.lng);
-    return ` (${dist.toFixed(1)} mi away)`;
+    return ` (${dist.toFixed(1)} mi)`;
   };
 
   return (
-    <div className={styles.searchPage}>
-      <div className={styles.globalSearchWrapper}>
-        <div className={styles.searchSplitRow}>
-          <div className={styles.searchColumn}>
-            <SearchBar onSearch={(val) => setGlobalSearch(val)} />
-          </div>
-          <div className={styles.zipColumn}>
-            <input
-              type="text"
-              className={styles.zipInputStyled}
-              placeholder="ZIP"
-              value={zip}
-              onChange={(e) => setZip(e.target.value)}
+    <div className="container py-4">
+      <div className="search-controls mb-4">
+        <div className="row g-3 mb-3">
+          <div className="col-md-8">
+            <SearchBar 
+              value={globalSearch} 
+              onSearch={(val) => setGlobalSearch(val)} 
+              placeholder="Search by name, subject, language or location..."
             />
-            <select
-              className={styles.radiusSelect}
-              value={radius}
-              onChange={(e) => setRadius(parseInt(e.target.value))}
+          </div>
+          <div className="col-md-4">
+            <div className="input-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="ZIP Code"
+                value={zip}
+                onChange={(e) => setZip(e.target.value)}
+              />
+              <select
+                className="form-select"
+                value={radius}
+                onChange={(e) => setRadius(parseInt(e.target.value))}
+                style={{ maxWidth: '100px' }}
+              >
+                <option value={5}>5 mi</option>
+                <option value={10}>10 mi</option>
+                <option value={15}>15 mi</option>
+                <option value={25}>25 mi</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="row g-2">
+          <div className="col-6 col-md-2">
+            <select 
+              value={selectedSubject} 
+              onChange={(e) => setSelectedSubject(e.target.value)} 
+              className="form-select"
             >
-              <option value={5}>5 mi</option>
-              <option value={10}>10 mi</option>
-              <option value={15}>15 mi</option>
-              <option value={25}>25 mi</option>
+              <option value="All">All Subjects</option>
+              {allSubjects.map(subject => (
+                <option key={subject} value={subject}>{subject}</option>
+              ))}
+            </select>
+          </div>
+          <div className="col-6 col-md-2">
+            <select 
+              value={selectedLanguage} 
+              onChange={(e) => setSelectedLanguage(e.target.value)} 
+              className="form-select"
+            >
+              <option value="All">All Languages</option>
+              {allLanguages.map(language => (
+                <option key={language} value={language}>{language}</option>
+              ))}
+            </select>
+          </div>
+          <div className="col-6 col-md-2">
+            <select 
+              value={selectedDay} 
+              onChange={(e) => setSelectedDay(e.target.value)} 
+              className="form-select"
+            >
+              <option value="All">Any Day</option>
+              <option value="monday">Monday</option>
+              <option value="tuesday">Tuesday</option>
+              <option value="wednesday">Wednesday</option>
+              <option value="thursday">Thursday</option>
+              <option value="friday">Friday</option>
+              <option value="saturday">Saturday</option>
+              <option value="sunday">Sunday</option>
+            </select>
+          </div>
+          <div className="col-6 col-md-2">
+            <select 
+              value={selectedPrice} 
+              onChange={(e) => setSelectedPrice(e.target.value)} 
+              className="form-select"
+            >
+              <option value="All">Any Price</option>
+              <option value="<20">Under $20</option>
+              <option value="20-40">$20 - $40</option>
+              <option value=">40">Over $40</option>
+            </select>
+          </div>
+          <div className="col-6 col-md-4">
+            <select 
+              value={sortOption} 
+              onChange={(e) => setSortOption(e.target.value)} 
+              className="form-select"
+            >
+              <option value="distance">Sort by Distance</option>
+              <option value="relevance">Sort by Relevance</option>
+              <option value="lowToHigh">Price: Low to High</option>
+              <option value="highToLow">Price: High to Low</option>
             </select>
           </div>
         </div>
       </div>
 
-      <div className={styles.filterBar}>
-        <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} className={styles.filterPill}>
-          <option value="All">Subject</option>
-          {allSubjects.map(subject => (
-            <option key={subject} value={subject}>{subject}</option>
-          ))}
-        </select>
-        <select value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.target.value)} className={styles.filterPill}>
-          <option value="All">Language</option>
-          {allLanguages.map(language => (
-            <option key={language} value={language}>{language}</option>
-          ))}
-        </select>
-        <select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className={styles.filterPill}>
-          <option value="All">Availability</option>
-          <option value="monday">Monday</option>
-          <option value="tuesday">Tuesday</option>
-          <option value="wednesday">Wednesday</option>
-          <option value="thursday">Thursday</option>
-          <option value="friday">Friday</option>
-          <option value="saturday">Saturday</option>
-          <option value="sunday">Sunday</option>
-        </select>
-        <select value={selectedPrice} onChange={(e) => setSelectedPrice(e.target.value)} className={styles.filterPill}>
-          <option value="All">Price</option>
-          <option value="<20">Under $20</option>
-          <option value="20-40">$20 - $40</option>
-          <option value=">40">Over $40</option>
-        </select>
-        <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} className={styles.filterPill}>
-          <option value="distance">Distance</option>
-          <option value="relevance">Relevance</option>
-          <option value="lowToHigh">Price: Low to High</option>
-          <option value="highToLow">Price: High to Low</option>
-        </select>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4 className="mb-0">Search Results</h4>
+        <small className="text-muted">{sortedTutors.length} tutors found</small>
       </div>
 
-      <h2 className={styles.resultsHeading}>Search Results</h2>
-      <div className={styles.gridContainer}>
-        {sortedTutors.length > 0 ? (
-          sortedTutors.map((tutor, index) => (
-            <section
+      {/* Improved search cards */}
+      {sortedTutors.length > 0 ? (
+        <div className="row g-3">
+          {sortedTutors.map((tutor, index) => (
+            <div
               key={tutor.id || `${tutor.name}-${index}`}
-              className={styles.cardSmallBox}
+              className="col-md-6 col-lg-4"
               onClick={() => router.push(`/TutorPublicProfile?id=${tutor.id}`)}
               style={{ cursor: 'pointer' }}
             >
-              <img src={tutor.image || '/images/default-profile.png'} alt={tutor.name} className={styles.cardImageSmall} />
-              <div className={styles.cardContentSmall}>
-                <h2>{tutor.name}</h2>
-                <p className={styles.detail}>
-                  {tutor.subjects && tutor.subjects.slice(0, 2).join(", ")}
-                  {tutor.subjects && tutor.subjects.length > 2 ? ', ...' : ''}
-                </p>
-                <p className={styles.detail}>
-                  {tutor.languages && tutor.languages.slice(0, 2).join(", ")}
-                  {tutor.languages && tutor.languages.length > 2 ? ', ...' : ''}
-                </p>
-                <p className={styles.detail}>{tutor.certifications}</p>
-                <p className={styles.detail}>📅 Available: {formatAvailabilityDays(tutor)}</p>
-                <p className={styles.detail}>📍 {tutor.location}{getDistanceLabel(tutor)}</p>
-                <p className={styles.detail}>💵 ${tutor.price}/hr</p>
+              <div className="tutor-card card h-100 shadow-sm hover-shadow">
+                <div className="row g-0">
+                  <div className="col-4 d-flex justify-content-center align-items-center p-3">
+                    <div className="tutor-image-container">
+                      <img 
+                        src={tutor.image || '/images/default-profile.png'} 
+                        alt={tutor.name} 
+                        className="tutor-image rounded-circle"
+                      />
+                      <div className="price-badge">
+                        <span>${tutor.price}/hr</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-8">
+                    <div className="card-body pt-3 pb-2 px-3">
+                      <h5 className="card-title mb-1">{tutor.name}</h5>
+                      
+                      {/* Top subjects */}
+                      <div className="mb-2">
+                        {tutor.subjects && tutor.subjects.slice(0, 2).map((subject, idx) => (
+                          <span key={idx} className="badge bg-primary me-1 mb-1">{subject}</span>
+                        ))}
+                        {tutor.subjects && tutor.subjects.length > 2 && (
+                          <span className="badge bg-secondary">+{tutor.subjects.length - 2} more</span>
+                        )}
+                      </div>
+                      
+                      {/* Languages */}
+                      {tutor.languages && tutor.languages.length > 0 && (
+                        <div className="small mb-1">
+                          <i className="bi bi-translate text-primary me-1"></i>
+                          {tutor.languages.slice(0, 2).join(", ")}
+                          {tutor.languages.length > 2 && " + "+(tutor.languages.length-2)+" more"}
+                        </div>
+                      )}
+                      
+                      {/* Location and distance */}
+                      {tutor.location && (
+                        <div className="small mb-1">
+                          <i className="bi bi-geo-alt-fill text-primary me-1"></i>
+                          {tutor.location}{getDistanceLabel(tutor)}
+                        </div>
+                      )}
+                      
+                      {/* Availability */}
+                      <div className="small mb-1">
+                        <i className="bi bi-calendar-check text-primary me-1"></i>
+                        {formatAvailabilityDays(tutor)}
+                      </div>
+                      
+                      {/* Certifications - only if they exist */}
+                      {tutor.certifications && (
+                        <div className="small text-truncate mb-1" title={tutor.certifications}>
+                          <i className="bi bi-award text-primary me-1"></i>
+                          {tutor.certifications}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </section>
-          ))
-        ) : (
-          <p className={styles.noResults}>No tutors found for your search. Please try again.</p>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="p-4 text-center">
+          <i className="bi bi-search fs-1 text-muted mb-3"></i>
+          <h4>No tutors found</h4>
+          <p className="text-muted">Try adjusting your search filters or try another search term.</p>
+        </div>
+      )}
+      <style jsx>{`
+        .tutor-card {
+          transition: all 0.2s ease;
+          border-radius: 10px;
+          overflow: hidden;
+        }
+        
+        .hover-shadow:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .tutor-image-container {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        
+        .tutor-image {
+          width: 90px;
+          height: 90px;
+          object-fit: cover;
+          border: 3px solid #fff;
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .price-badge {
+          position: absolute;
+          bottom: -5px;
+          background-color: #0d6efd;
+          color: white;
+          font-weight: bold;
+          padding: 2px 8px;
+          border-radius: 10px;
+          font-size: 0.8rem;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .badge {
+          font-weight: 500;
+        }
+      `}</style>
     </div>
   );
 }

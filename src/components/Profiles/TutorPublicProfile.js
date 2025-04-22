@@ -95,14 +95,6 @@ const TutorPublicProfile = () => {
 		));
 	};
 
-	const renderLanguages = (languages) => {
-		if (!languages || !Array.isArray(languages) || languages.length === 0) {
-			return <span>No languages specified</span>;
-		}
-
-		return languages.join(', ');
-	};
-
 	const renderCertifications = (certifications) => {
 		if (
 			!certifications ||
@@ -243,14 +235,51 @@ const TutorPublicProfile = () => {
 							<h3 className="h5 mb-0">Contact Information</h3>
 						</div>
 						<div className="card-body">
-							<p className="mb-2">
-								<i className="bi bi-geo-alt-fill text-primary me-2"></i>
-								{tutor.location || 'No location provided'}
-							</p>
-							<p className="mb-0">
-								<i className="bi bi-translate text-primary me-2"></i>
-								{renderLanguages(tutor.languages)}
-							</p>
+							{/* Simplified contact information styling */}
+							{tutor.location && (
+								<div className="mb-3">
+									<div className="d-flex align-items-center">
+										<i className="bi bi-geo-alt-fill text-primary me-2"></i>
+										<span>{tutor.location}</span>
+									</div>
+									<small className="text-muted ms-4">Location</small>
+								</div>
+							)}
+
+							{tutor.email && (
+								<div className="mb-3">
+									<div className="d-flex align-items-center">
+										<i className="bi bi-envelope-fill text-primary me-2"></i>
+										<span>{tutor.email}</span>
+									</div>
+									<small className="text-muted ms-4">Email</small>
+								</div>
+							)}
+
+							{tutor.phone && (
+								<div className="mb-3">
+									<div className="d-flex align-items-center">
+										<i className="bi bi-telephone-fill text-primary me-2"></i>
+										<span>{tutor.phone}</span>
+									</div>
+									<small className="text-muted ms-4">Phone</small>
+								</div>
+							)}
+
+              <div className="mt-4">
+                <h6 className="mb-2">Languages</h6>
+                {!tutor.languages || tutor.languages.length === 0 ? (
+                  <p className="text-muted fst-italic">No languages specified</p>
+                ) : (
+                  <div className="d-flex flex-wrap gap-2">
+                    {tutor.languages.map((language, index) => (
+                      <span key={index} className="badge bg-primary me-1 mb-1">
+                        {language}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
 						</div>
 					</div>
 				</div>
@@ -344,5 +373,6 @@ const TutorPublicProfile = () => {
 			</div>
 		</div>
 	);
-}
+};
+
 export default TutorPublicProfile;
