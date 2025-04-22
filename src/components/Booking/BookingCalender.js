@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../services/context/AuthContext';
-import { collection, doc, getDocs, query, where, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../../../firebaseConfig';
-import BookingForm from './BookingForm';
+import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
 
 const BookingCalendar = ({ tutorId, tutorName, availability, hourlyRate }) => {
   const router = useRouter();
@@ -15,8 +14,7 @@ const BookingCalendar = ({ tutorId, tutorName, availability, hourlyRate }) => {
   const [bookedSlots, setBookedSlots] = useState([]);
   const [calendarDays, setCalendarDays] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [showBookingForm, setShowBookingForm] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -207,19 +205,45 @@ const BookingCalendar = ({ tutorId, tutorName, availability, hourlyRate }) => {
     const formattedDate = dateObj.date.toISOString().split('T')[0];
     setSelectedDate(formattedDate);
     setSelectedSlot(null);
-    setShowBookingForm(false);
+  };
+  
+  // Format time to 12-hour format with AM/PM
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    
+    return `${formattedHour}:${minutes} ${ampm}`;
   };
   
   // Handle time slot selection
   const handleSlotSelect = (slot) => {
     setSelectedSlot(slot);
-    setShowBookingForm(true);
-  };
-  
-  // Handle successful booking
-  const handleBookingSuccess = () => {
-    // Redirect to student dashboard or show confirmation
-    router.push('/StudentDashboard');
+    
+    // Prepare session data
+    const sessionDate = new Date(selectedDate);
+    const [hours, minutes] = slot.start.split(':').map(Number);
+    sessionDate.setHours(hours, minutes, 0, 0);
+    
+    // Pass to parent component or proceed to booking form
+    if (currentUser) {
+      router.push({
+        pathname: '/BookSession',
+        query: {
+          tutorId,
+          tutorName,
+          date: selectedDate,
+          startTime: slot.start,
+          endTime: slot.end,
+          price: hourlyRate
+        }
+      });
+    } else {
+      router.push(`/Login?redirect=TutorPublicProfile?id=${tutorId}`);
+    }
   };
   
   // Format date for display
@@ -265,132 +289,110 @@ const BookingCalendar = ({ tutorId, tutorName, availability, hourlyRate }) => {
   };
   
   return (
-    <div className="booking-calendar">
+    <div className="booking-calendar mb-4">
       {error && (
         <div className="alert alert-danger mb-3" role="alert">
           {error}
         </div>
       )}
       
-      <div className="row">
-        <div className="col-md-7">
-          {/* Calendar Header */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h4 className="mb-0">
-              {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-            </h4>
-            <div className="btn-group">
-              <button 
-                type="button" 
-                className="btn btn-outline-secondary"
-                onClick={prevMonth}
-              >
-                <i className="bi bi-chevron-left"></i>
-              </button>
-              <button 
-                type="button" 
-                className="btn btn-outline-secondary"
-                onClick={nextMonth}
-              >
-                <i className="bi bi-chevron-right"></i>
-              </button>
-            </div>
+      <div className="card">
+        <div className="card-header bg-white d-flex justify-content-between align-items-center">
+          <h4 className="mb-0">
+            {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+          </h4>
+          <div className="btn-group">
+            <button 
+              type="button" 
+              className="btn btn-outline-secondary"
+              onClick={prevMonth}
+            >
+              <i className="bi bi-chevron-left"></i>
+            </button>
+            <button 
+              type="button" 
+              className="btn btn-outline-secondary"
+              onClick={nextMonth}
+            >
+              <i className="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div className="card-body p-0">
+          {/* Weekday Headers */}
+          <div className="row g-0 text-center">
+            {dayNames.map((day, index) => (
+              <div key={index} className="col border-bottom p-2">
+                <small>{day.substring(0, 3)}</small>
+              </div>
+            ))}
           </div>
           
-          {/* Calendar Grid */}
-          <div className="card mb-4">
-            <div className="card-body p-0">
-              {/* Weekday Headers */}
-              <div className="row g-0 text-center">
-                {dayNames.map((day, index) => (
-                  <div key={index} className="col border-bottom p-2">
-                    <small>{day.substring(0, 3)}</small>
+          {/* Calendar Days */}
+          <div className="calendar-grid">
+            {calendarDays.length > 0 && (
+              <div className="row g-0">
+                {calendarDays.map((day, index) => (
+                  <div
+                    key={index}
+                    className={`col text-center border ${getDayClass(day)}`}
+                    onClick={() => handleDateSelect(day)}
+                    style={{ cursor: 'pointer', height: '60px' }}
+                  >
+                    {day.day}
+                    
+                    {/* Availability Indicator */}
+                    {day.isCurrentMonth && availability && day.dayName && 
+                      availability[day.dayName]?.available && 
+                      availability[day.dayName]?.slots?.length > 0 && 
+                      day.date >= new Date().setHours(0, 0, 0, 0) && (
+                        <div 
+                          className="position-absolute bottom-0 start-50 translate-middle-x mb-1"
+                          style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: day.date.toISOString().split('T')[0] === selectedDate ? 'white' : '#0d6efd' }}
+                        ></div>
+                      )
+                    }
                   </div>
                 ))}
               </div>
-              
-              {/* Calendar Days */}
-              <div className="calendar-grid">
-                {calendarDays.length > 0 && (
-                  <div className="row g-0">
-                    {calendarDays.map((day, index) => (
-                      <div
-                        key={index}
-                        className={`col text-center border ${getDayClass(day)}`}
-                        onClick={() => handleDateSelect(day)}
-                        style={{ cursor: 'pointer', height: '60px' }}
-                      >
-                        {day.day}
-                        
-                        {/* Availability Indicator */}
-                        {day.isCurrentMonth && availability && day.dayName && 
-                          availability[day.dayName]?.available && 
-                          availability[day.dayName]?.slots?.length > 0 && 
-                          day.date >= new Date().setHours(0, 0, 0, 0) && (
-                            <div 
-                              className="position-absolute bottom-0 start-50 translate-middle-x mb-1"
-                              style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: day.date.toISOString().split('T')[0] === selectedDate ? 'white' : '#0d6efd' }}
-                            ></div>
-                          )
-                        }
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            )}
           </div>
-          
-          {/* Selected Date and Available Slots */}
-          {selectedDate && (
-            <div className="mb-4">
-              <h5>Available Times on {formatDisplayDate(selectedDate)}</h5>
-              
-              {loading ? (
-                <div className="d-flex justify-content-center my-4">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </div>
-              ) : availableSlots.length > 0 ? (
-                <div className="row g-2">
-                  {availableSlots.map((slot, index) => (
-                    <div key={index} className="col-md-4 col-6">
-                      <button
-                        type="button"
-                        className={`btn btn-outline-primary w-100 ${selectedSlot === slot ? 'active' : ''}`}
-                        onClick={() => handleSlotSelect(slot)}
-                      >
-                        {slot.start} - {slot.end}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="alert alert-warning" role="alert">
-                  No available slots on this date.
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        
-        <div className="col-md-5">
-          {/* Booking Form */}
-          {showBookingForm && selectedSlot && (
-            <BookingForm
-              tutorId={tutorId}
-              tutorName={tutorName}
-              studentId={currentUser.uid}
-              date={selectedDate}
-              startTime={selectedSlot.start}
-              endTime={selectedSlot.end}
-              hourlyRate={hourlyRate}
-              onBookingSuccess={handleBookingSuccess}
-            />
-          )}
         </div>
       </div>
+      
+      {/* Selected Date and Available Slots */}
+      {selectedDate && (
+        <div className="mt-3">
+          <h5>Available Times on {formatDisplayDate(selectedDate)}</h5>
+          
+          {loading ? (
+            <div className="d-flex justify-content-center my-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          ) : availableSlots.length > 0 ? (
+            <div className="row g-2 mt-2">
+              {availableSlots.map((slot, index) => (
+                <div key={index} className="col-md-4 col-6">
+                  <button
+                    type="button"
+                    className={`btn btn-outline-primary w-100 ${selectedSlot === slot ? 'active' : ''}`}
+                    onClick={() => handleSlotSelect(slot)}
+                  >
+                    {formatTime(slot.start)} - {formatTime(slot.end)}
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="alert alert-warning" role="alert">
+              No available slots on this date.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

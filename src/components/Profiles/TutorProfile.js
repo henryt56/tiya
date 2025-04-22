@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -13,6 +13,47 @@ const TutorProfile = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   const [isNewUser, setIsNewUser] = useState(false);
+  const topRef = useRef(null); // Reference for scrolling to top
+  
+  // Generate time options with 30-minute intervals (change to 15 if preferred)
+  const generateTimeOptions = (interval = 30) => {
+    const options = [];
+    const totalMinutesInDay = 24 * 60;
+    
+    for (let minutes = 0; minutes < totalMinutesInDay; minutes += interval) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      
+      // Format hours for 12-hour clock with AM/PM
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours % 12 || 12;
+      
+      // Format as HH:MM for value (24-hour for database)
+      const value = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+      
+      // Format as "1:30 PM" for display
+      const display = `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
+      
+      options.push({ value, display });
+    }
+    
+    return options;
+  };
+  
+  // Create time options with 30-minute intervals
+  const timeOptions = generateTimeOptions(30);
+  
+  // Format time from 24h to 12h with AM/PM
+  const formatTimeAMPM = (timeString) => {
+    if (!timeString) return '';
+    
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    
+    return `${formattedHour}:${minutes} ${ampm}`;
+  };
   
   // Profile fields
   const [profileData, setProfileData] = useState({
@@ -99,6 +140,11 @@ const TutorProfile = () => {
             profilePhoto: userData.profilePhoto || '',
             certifications: userData.certifications || [],
             languages: userData.languages || [],
+            // Ensure contact information is loaded
+            email: userData.email || '',
+            phone: userData.phone || '',
+            location: userData.location || '',
+            coordinates: userData.coordinates || null
           }));
           
           // Set photo preview if exists
@@ -221,6 +267,12 @@ const TutorProfile = () => {
   // Add time slot
   const handleAddTimeSlot = (day, startTime, endTime) => {
     if (startTime && endTime) {
+      // Validate that end time is after start time
+      if (startTime >= endTime) {
+        alert('End time must be after start time');
+        return;
+      }
+      
       setProfileData(prev => ({
         ...prev,
         availability: {
@@ -246,6 +298,11 @@ const TutorProfile = () => {
         }
       }
     }));
+  };
+  
+  // Scroll to top function
+  const scrollToTop = () => {
+    topRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
   
   // Handle form submit
@@ -288,7 +345,12 @@ const TutorProfile = () => {
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, updatedUserData);
       
-      setMessage({ text: 'Profile saved successfully!', type: 'success' });
+      // Success! Set message and scroll to top
+      setMessage({ 
+        text: 'Profile saved successfully!', 
+        type: 'success' 
+      });
+      scrollToTop();
       
       // If new user, redirect to dashboard
       if (isNewUser) {
@@ -299,9 +361,15 @@ const TutorProfile = () => {
     } catch (error) {
       console.error('Error saving profile:', error);
       setMessage({ text: 'Failed to save profile: ' + error.message, type: 'danger' });
+      scrollToTop();
     } finally {
       setSaving(false);
     }
+  };
+  
+  // Navigate to dashboard
+  const goToDashboard = () => {
+    router.push('/TutorDashboard');
   };
   
   if (loading) {
@@ -315,12 +383,22 @@ const TutorProfile = () => {
   }
   
   return (
-    <div className="container py-4">
+    <div className="container py-4" ref={topRef}>
       <h1 className="mb-4">{isNewUser ? 'Complete Your Tutor Profile' : 'Your Tutor Profile'}</h1>
       
       {message.text && (
         <div className={`alert alert-${message.type} mb-4`} role="alert">
-          {message.text}
+          <div className="d-flex justify-content-between align-items-center">
+            <span>{message.text}</span>
+            {message.type === 'success' && (
+              <button 
+                className="btn btn-outline-primary" 
+                onClick={goToDashboard}
+              >
+                Go to Dashboard
+              </button>
+            )}
+          </div>
         </div>
       )}
       
@@ -346,7 +424,7 @@ const TutorProfile = () => {
                     className="rounded-circle bg-light d-flex align-items-center justify-content-center me-3"
                     style={{ width: '120px', height: '120px' }}
                   >
-                    <span className="text-muted">DO NOT ADD PHOTO YET</span>
+                    <span className="text-muted">Upload Photo</span>
                   </div>
                 )}
                 <div>
@@ -358,7 +436,7 @@ const TutorProfile = () => {
                     className="form-control d-none"
                   />
                   <label htmlFor="profile-photo" className="btn btn-outline-primary">
-                    PFP NOT WORKING CURRENTLY !
+                    Upload
                   </label>
                 </div>
               </div>
@@ -626,7 +704,7 @@ const TutorProfile = () => {
                           <div className="mb-3">
                             {dayData.slots.map((slot, idx) => (
                               <div key={idx} className="d-flex align-items-center bg-light p-2 mb-2 rounded">
-                                <span>{slot.start} - {slot.end}</span>
+                                <span>{formatTimeAMPM(slot.start)} - {formatTimeAMPM(slot.end)}</span>
                                 <button
                                   type="button"
                                   className="btn btn-sm text-danger ms-auto"
@@ -641,18 +719,32 @@ const TutorProfile = () => {
                         
                         <div className="row g-2">
                           <div className="col-5">
-                            <input 
-                              type="time" 
+                            <select 
                               id={`${day}-start`} 
-                              className="form-control"
-                            />
+                              className="form-select"
+                              aria-label="Start time"
+                            >
+                              <option value="">Start time</option>
+                              {timeOptions.map((time, idx) => (
+                                <option key={`start-${idx}`} value={time.value}>
+                                  {time.display}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                           <div className="col-5">
-                            <input 
-                              type="time" 
+                            <select 
                               id={`${day}-end`} 
-                              className="form-control" 
-                            />
+                              className="form-select"
+                              aria-label="End time"
+                            >
+                              <option value="">End time</option>
+                              {timeOptions.map((time, idx) => (
+                                <option key={`end-${idx}`} value={time.value}>
+                                  {time.display}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                           <div className="col-2">
                             <button
@@ -661,9 +753,18 @@ const TutorProfile = () => {
                               onClick={() => {
                                 const startEl = document.getElementById(`${day}-start`);
                                 const endEl = document.getElementById(`${day}-end`);
-                                handleAddTimeSlot(day, startEl.value, endEl.value);
-                                startEl.value = '';
-                                endEl.value = '';
+                                if(startEl.value && endEl.value) {
+                                  // Validate that end time is after start time
+                                  if(startEl.value >= endEl.value) {
+                                    alert('End time must be after start time');
+                                    return;
+                                  }
+                                  handleAddTimeSlot(day, startEl.value, endEl.value);
+                                  startEl.value = '';
+                                  endEl.value = '';
+                                } else {
+                                  alert('Please select both start and end times');
+                                }
                               }}
                             >
                               <i className="bi bi-plus"></i>
@@ -726,6 +827,13 @@ const TutorProfile = () => {
         
         <div className="d-grid gap-2 d-md-flex justify-content-md-end">
           <button
+            type="button"
+            className="btn btn-outline-secondary btn-lg me-2"
+            onClick={goToDashboard}
+          >
+            Cancel
+          </button>
+          <button
             type="submit"
             className="btn btn-primary btn-lg px-4"
             disabled={saving}
@@ -741,6 +849,15 @@ const TutorProfile = () => {
           </button>
         </div>
       </form>
+      
+      {/* Back to top button */}
+      <button 
+        className="btn btn-primary rounded-circle position-fixed"
+        style={{ bottom: '2rem', right: '2rem', width: '50px', height: '50px' }}
+        onClick={scrollToTop}
+      >
+        <i className="bi bi-arrow-up"></i>
+      </button>
     </div>
   );
 };

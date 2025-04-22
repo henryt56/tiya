@@ -26,11 +26,10 @@ export default function TransactionHistory() {
 			try {
 				setLoading(true);
 				const sessionsRef = collection(db, 'sessions');
-				// Only fetch from sessions involving the current user AND where payment was initiated, complete or not
 				const q = query(
 					sessionsRef,
 					where('studentId', '==', currentUser.uid),
-					where('paymentStatus', 'in', ['paid', 'unpaid']),
+					where('paymentStatus', 'in', ['paid', 'unpaid'])
 				);
 
 				const querySnapshot = await getDocs(q);
@@ -73,7 +72,6 @@ export default function TransactionHistory() {
 				});
 
 				sessionData.sort((a, b) => b.rawDate - a.rawDate);
-
 				setTransactions(sessionData);
 			} catch (e) {
 				console.error('Error fetching transactions:', e);
@@ -90,13 +88,8 @@ export default function TransactionHistory() {
 		const start = startDate ? dayjs(startDate).format('YYYY-MM-DD') : null;
 		const end = endDate ? dayjs(endDate).format('YYYY-MM-DD') : null;
 
-		if (start && !end) {
-			return tDate >= start;
-		}
-
-		if (!start && end) {
-			return tDate <= end;
-		}
+		if (start && !end) return tDate >= start;
+		if (!start && end) return tDate <= end;
 
 		return tDate >= start && tDate <= end;
 	});
@@ -105,13 +98,10 @@ export default function TransactionHistory() {
 		setPage(1);
 	}, [startDate, endDate, dateFilterChanged]);
 
-	const totalPages = Math.max(
-		1,
-		Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE),
-	);
+	const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE));
 	const pageData = filteredTransactions.slice(
 		(page - 1) * ITEMS_PER_PAGE,
-		page * ITEMS_PER_PAGE,
+		page * ITEMS_PER_PAGE
 	);
 
 	const handleStartDateChange = (newValue) => {
@@ -135,15 +125,7 @@ export default function TransactionHistory() {
 			if (page <= 4) {
 				pages.push(1, 2, 3, 4, 5, '...', totalPages);
 			} else if (page >= totalPages - 3) {
-				pages.push(
-					1,
-					'...',
-					totalPages - 4,
-					totalPages - 3,
-					totalPages - 2,
-					totalPages - 1,
-					totalPages,
-				);
+				pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
 			} else {
 				pages.push(1, '...', page - 1, page, page + 1, '...', totalPages);
 			}
@@ -162,101 +144,85 @@ export default function TransactionHistory() {
 				>
 					{p}
 				</button>
-			),
+			)
 		);
 	};
 
 	return (
-		<div className={styles.transactionHistoryContainer}>
-			<div className={styles.flexLayout}>
-				<div className={styles.leftColumn}>
-					<h1 className={styles.heading}>Transaction History</h1>
-					<div className={styles.calendarWrapper}>
-						<label className={styles.rangeLabel}>Date Range</label>
-						<LocalizationProvider dateAdapter={AdapterDayjs}>
-							<div className={styles.dateInputs}>
-								<DatePicker
-									label="Start Date"
-									value={startDate}
-									onChange={handleStartDateChange}
-									slotProps={{
-										textField: {
-											size: 'small',
-										},
-									}}
-								/>
-								<span className={styles.toLabel}>to</span>
-								<DatePicker
-									label="End Date"
-									value={endDate}
-									onChange={handleEndDateChange}
-									slotProps={{
-										textField: {
-											size: 'small',
-										},
-									}}
-								/>
-							</div>
-						</LocalizationProvider>
+		<div className={styles.pageContainer}>
+			<div className={styles.transactionHistoryContainer}>
+				<div className={styles.flexLayout}>
+					<div className={styles.leftColumn}>
+						<h1 className={styles.heading}>Transaction History</h1>
+						<div className={styles.calendarWrapper}>
+							<label className={styles.rangeLabel}>Date Range</label>
+							<LocalizationProvider dateAdapter={AdapterDayjs}>
+								<div className={styles.dateInputs}>
+									<DatePicker
+										label="Start Date"
+										value={startDate}
+										onChange={handleStartDateChange}
+										slotProps={{
+											textField: { size: 'small' },
+										}}
+									/>
+									<span className={styles.toLabel}>to</span>
+									<DatePicker
+										label="End Date"
+										value={endDate}
+										onChange={handleEndDateChange}
+										slotProps={{
+											textField: { size: 'small' },
+										}}
+									/>
+								</div>
+							</LocalizationProvider>
+						</div>
+					</div>
+
+					<div className={styles.transactionTableWrapper}>
+						<table className={styles.transactionTable}>
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th>Status</th>
+									<th>Order To</th>
+								</tr>
+							</thead>
+							<tbody>
+								{loading ? (
+									<tr>
+										<td colSpan={3} style={{ textAlign: 'center' }}>Loading...</td>
+									</tr>
+								) : pageData.length > 0 ? (
+									pageData.map((t) => (
+										<tr key={t.id}>
+											<td><i>{t.date}</i></td>
+											<td><i>{t.status}</i></td>
+											<td><i>{t.tutor}</i></td>
+										</tr>
+									))
+								) : (
+									<tr>
+										<td colSpan={3} style={{ textAlign: 'center' }}>
+											No transactions found
+										</td>
+									</tr>
+								)}
+							</tbody>
+						</table>
 					</div>
 				</div>
 
-				<div className={styles.transactionTableWrapper}>
-					<table className={styles.transactionTable}>
-						<thead>
-							<tr>
-								<th>Date</th>
-								<th>Status</th>
-								<th>Order To</th>
-							</tr>
-						</thead>
-						<tbody>
-							{loading ? (
-								<tr>
-									<td colSpan={3} style={{ textAlign: 'center' }}>
-										Loading...
-									</td>
-								</tr>
-							) : pageData.length > 0 ? (
-								pageData.map((t) => (
-									<tr key={t.id}>
-										<td>
-											<i>{t.date}</i>
-										</td>
-										<td>
-											<i>{t.status}</i>
-										</td>
-										<td>
-											<i>{t.tutor}</i>
-										</td>
-									</tr>
-								))
-							) : (
-								<tr>
-									<td colSpan={3} style={{ textAlign: 'center' }}>
-										No transactions found
-									</td>
-								</tr>
-							)}
-						</tbody>
-					</table>
+				<div className={styles.pagination}>
+					<button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
+						← Previous
+					</button>
+					{renderPagination()}
+					<button onClick={() => setPage((p) => Math.min(p + 1, totalPages))} disabled={page === totalPages}>
+						Next →
+					</button>
 				</div>
-			</div>
-
-			<div className={styles.pagination}>
-				<button
-					onClick={() => setPage((p) => Math.max(p - 1, 1))}
-					disabled={page === 1}
-				>
-					← Previous
-				</button>
-				{renderPagination()}
-				<button
-					onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-					disabled={page === totalPages}
-				>
-					Next →
-				</button>
 			</div>
 		</div>
 	);

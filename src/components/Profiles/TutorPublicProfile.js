@@ -1,4 +1,3 @@
-// Updated TutorPublicProfile.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { doc, getDoc } from 'firebase/firestore';
@@ -42,6 +41,18 @@ const TutorPublicProfile = () => {
 		fetchTutorProfile();
 	}, [id]);
 
+	// Format time to 12-hour format with AM/PM
+	const formatTime = (timeString) => {
+		if (!timeString) return '';
+		
+		const [hours, minutes] = timeString.split(':');
+		const hour = parseInt(hours, 10);
+		const ampm = hour >= 12 ? 'PM' : 'AM';
+		const formattedHour = hour % 12 || 12;
+		
+		return `${formattedHour}:${minutes} ${ampm}`;
+	};
+
 	// Helper functions to render complex data types properly
 	const renderAvailability = (availabilityData) => {
 		if (!availabilityData || typeof availabilityData !== 'object') {
@@ -53,14 +64,23 @@ const TutorPublicProfile = () => {
 			.filter(([_, dayData]) => dayData.available)
 			.map(([day, dayData]) => {
 				const slots = dayData.slots
-					.map((slot) => `${slot.start}-${slot.end}`)
+					.map((slot) => `${formatTime(slot.start)} - ${formatTime(slot.end)}`)
 					.join(', ');
 				const formattedDay = day.charAt(0).toUpperCase() + day.slice(1);
-				return slots.length ? `${formattedDay} (${slots})` : formattedDay;
-			})
-			.join(', ');
+				return slots.length ? (
+					<div key={day} className="mb-2">
+						<strong>{formattedDay}</strong>: {slots}
+					</div>
+				) : (
+					<div key={day} className="mb-1">{formattedDay}</div>
+				);
+			});
 
-		return availableDays || 'No availability set';
+		return availableDays.length ? (
+			<div>{availableDays}</div>
+		) : (
+			'No availability set'
+		);
 	};
 
 	const renderSubjects = (subjects) => {
@@ -73,14 +93,6 @@ const TutorPublicProfile = () => {
 				{subject}
 			</span>
 		));
-	};
-
-	const renderLanguages = (languages) => {
-		if (!languages || !Array.isArray(languages) || languages.length === 0) {
-			return <span>No languages specified</span>;
-		}
-
-		return languages.join(', ');
 	};
 
 	const renderCertifications = (certifications) => {
@@ -171,9 +183,11 @@ const TutorPublicProfile = () => {
 									<p className="mb-0 fw-bold">${tutor.hourlyRate}/hr</p>
 									<small className="text-muted">Rate</small>
 								</div>
+								{/* Note: Rating is not implemented yet, so we'll show a placeholder */}
 								<div className="px-3 border-end">
 									<p className="mb-0 fw-bold">
-										{tutor.rating ? tutor.rating.toFixed(1) : 'N/A'}
+										<i className="bi bi-star-fill text-warning me-1"></i>
+										New
 									</p>
 									<small className="text-muted">Rating</small>
 								</div>
@@ -221,14 +235,51 @@ const TutorPublicProfile = () => {
 							<h3 className="h5 mb-0">Contact Information</h3>
 						</div>
 						<div className="card-body">
-							<p className="mb-2">
-								<i className="bi bi-geo-alt-fill text-primary me-2"></i>
-								{tutor.location || 'No location provided'}
-							</p>
-							<p className="mb-0">
-								<i className="bi bi-translate text-primary me-2"></i>
-								{renderLanguages(tutor.languages)}
-							</p>
+							{/* Simplified contact information styling */}
+							{tutor.location && (
+								<div className="mb-3">
+									<div className="d-flex align-items-center">
+										<i className="bi bi-geo-alt-fill text-primary me-2"></i>
+										<span>{tutor.location}</span>
+									</div>
+									<small className="text-muted ms-4">Location</small>
+								</div>
+							)}
+
+							{tutor.email && (
+								<div className="mb-3">
+									<div className="d-flex align-items-center">
+										<i className="bi bi-envelope-fill text-primary me-2"></i>
+										<span>{tutor.email}</span>
+									</div>
+									<small className="text-muted ms-4">Email</small>
+								</div>
+							)}
+
+							{tutor.phone && (
+								<div className="mb-3">
+									<div className="d-flex align-items-center">
+										<i className="bi bi-telephone-fill text-primary me-2"></i>
+										<span>{tutor.phone}</span>
+									</div>
+									<small className="text-muted ms-4">Phone</small>
+								</div>
+							)}
+
+              <div className="mt-4">
+                <h6 className="mb-2">Languages</h6>
+                {!tutor.languages || tutor.languages.length === 0 ? (
+                  <p className="text-muted fst-italic">No languages specified</p>
+                ) : (
+                  <div className="d-flex flex-wrap gap-2">
+                    {tutor.languages.map((language, index) => (
+                      <span key={index} className="badge bg-primary me-1 mb-1">
+                        {language}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
 						</div>
 					</div>
 				</div>
@@ -240,9 +291,15 @@ const TutorPublicProfile = () => {
 						</div>
 						<div className="card-body">
 							{tutor.bio ? <p>{tutor.bio}</p> : <p>No bio provided</p>}
+						</div>
+					</div>
 
-							<h4 className="h6 mt-4 mb-2">Availability</h4>
-							<p>{renderAvailability(tutor.availability)}</p>
+					<div className="card shadow-sm mb-4">
+						<div className="card-header bg-white">
+							<h3 className="h5 mb-0">Availability</h3>
+						</div>
+						<div className="card-body">
+							{renderAvailability(tutor.availability)}
 						</div>
 					</div>
 
