@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { doc, Timestamp } from 'firebase/firestore';
+import { doc, Timestamp, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);

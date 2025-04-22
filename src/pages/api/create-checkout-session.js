@@ -53,7 +53,7 @@ const createCheckoutSession = async (req, res) => {
 					},
 				],
 				mode: 'payment',
-				return_url: `${DOMAIN}/return?session_id={CHECKOUT_SESSION_ID}`,
+				return_url: `${DOMAIN}/ReturnPage?session_id={CHECKOUT_SESSION_ID}`,
 				metadata: {
 					sessionId: sessionId,
 					tutorId: sessionData.tutorId,
